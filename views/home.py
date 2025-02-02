@@ -1,14 +1,14 @@
 import streamlit as st
+from utils.function import create_title, create_section_title
 
-# Título principal
-st.title("Passos Mágicos")
 
-# Seção: Quem Somos
-st.header("Quem Somos")
+create_title("Passos Mágicos")
+
+create_section_title("Disclaimer")
 st.write("""
-A Associação Passos Mágicos tem uma trajetória de 31 anos de atuação, trabalhando na transformação da vida de crianças e jovens de baixa renda, proporcionando melhores oportunidades de vida.
+Este trabalho é de caráter exclusivamente acadêmico, elaborado no contexto de uma atividade sob a metodologia de Aprendizagem Baseada em Problemas (PBL).
 
-A transformação, idealizada por Michelle Flues e Dimetri Ivanoff, começou em 1992, atuando dentro de orfanatos no município de Embu-Guaçu.
-
-Em 2016, após anos de atuação, decidiram ampliar o programa para que mais jovens tivessem acesso a essa fórmula mágica de transformação que inclui: educação de qualidade, auxílio psicológico/psicopedagógico, ampliação da visão de mundo e protagonismo. Assim, passaram a atuar como um projeto social e educacional, criando a Associação Passos Mágicos.
+As informações, análises e conclusões apresentadas têm como único propósito o aprendizado e desenvolvimento dos participantes e não devem ser utilizadas para outros fins.
 """)
+
+create_section_title("Propósito")
