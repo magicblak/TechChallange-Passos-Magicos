@@ -1,0 +1,10 @@
+# Streamlit core
+streamlit==1.40.0
+
+# Bibliotecas de análise e manipulação de dados
+pandas==2.1.2
+numpy>=1.21.0
+
+# Utilitários essenciais
+setuptools>=65.5.0
+wheel>=0.41.0

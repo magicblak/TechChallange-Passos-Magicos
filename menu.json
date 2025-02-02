@@ -1,0 +1,20 @@
+{
+    "inicio":{
+        "title": "Início",
+        "file": "home.py",
+        "icon": "house:",
+        "default": 1
+    },
+    "sobre":{
+        "title": "Sobre",
+        "file": "about.py",
+        "icon": "account_circle:",
+        "default": 0
+    },
+    "ficha-aluno":{
+        "title": "Ficha estudante",
+        "file": "dashboard.py",
+        "icon": "analytics:",
+        "default": 0
+    }
+}
