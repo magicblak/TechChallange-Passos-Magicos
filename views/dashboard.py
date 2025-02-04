@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.functions import create_title, create_section_title, create_dataframe_view_stylized, create_student_history, create_scatter_plot
+from utils.functions import create_title, create_section_title, create_dataframe_view_stylized, create_student_history, create_scatter_plot, create_radar_polar_plot, create_line_chart_plot
 from controllers.dasboard_controller import Cluster_controller, Data_treatment_controller
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,8 +8,8 @@ create_title("Ficha do(a) estudante")
 cluster_creator = Cluster_controller()
 data_treater = Data_treatment_controller()
 
-df_raw_data = data_treater.get_treated_data()
-active_student_list = df_raw_data[['id', 'nome']][df_raw_data['situacao'] == 'Cursando']
+df_raw_data = data_treater.get_raw_data()
+active_student_list = df_raw_data[['id', 'nome']][(df_raw_data['situacao'] == 'Cursando') & (df_raw_data['phase'] < 8)]
 active_student_list.drop_duplicates(inplace=True)
 active_student_list.sort_values(by='nome', inplace=True)
 
@@ -23,7 +23,6 @@ selected_student = st.selectbox(
 if(selected_student != ''):
     max_year = df_raw_data['ano_ref'].max()
     selected_student_info = df_raw_data.query("nome == @selected_student and ano_ref == @max_year")
-    print(selected_student_info)
     create_student_history(        
         nome=selected_student_info.nome.values[0],
         idade=selected_student_info.age.values[0],
@@ -37,6 +36,36 @@ if(selected_student != ''):
         situacao=selected_student_info.situacao.values[0],
         ra=selected_student_info.ra.values[0]
     )
+    radar_plot_values = data_treater.get_compare_indidividual_indicator_with_mean(student_row_id=selected_student_info.id.values[0])
+    radar_plot_colors = {
+        'Estudante': '#9370DB',
+        'Média da fase': '#708090'     
+    }
+    st.plotly_chart(
+        create_radar_polar_plot(
+            data=radar_plot_values,
+            title='Indicadores atuais do(a) estudante',
+            color_map=radar_plot_colors
+        ),
+        use_container_width=True
+    )
+    inde_history_data = data_treater.get_historycal_inde(student_row_id=selected_student_info.id.values[0])
+    st.plotly_chart(
+        create_line_chart_plot(
+            data=inde_history_data,
+            title='Evolução do INDE',
+            x='ano_ref',
+            y='inde',
+            labels={
+                'ano_ref': 'ANO',
+                'inde': 'INDE'
+            }
+        ),
+        use_container_width=True
+    )
+    create_dataframe_view_stylized(data_treater.get_grades_history(student_row_id=selected_student_info.id.values[0]))
+    
+
     if(selected_student_info['phase'].values[0] < 8):
         df_same_phase, df_next_phase = cluster_creator.get_filtered_data_to_cluster_by_student(df_raw_data, selected_student, selected_student_info['phase'].values[0])
         if(len(df_same_phase) < 50):

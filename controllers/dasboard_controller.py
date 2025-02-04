@@ -9,19 +9,68 @@ from models.data_access import DataAccess
 class Data_treatment_controller:
     def __init__(self):
         return
+        
+    def __process_pipeline_to_use(self, df):
+        pipeline = Pipeline([
+            ('feature_engineer', FeatureEngineering())
+        ])
+        df_pipeline = pipeline.fit_transform(df)
+        return df_pipeline
     
-    def get_treated_data(self):
+    def get_raw_data(self):
         reader = DataAccess()
         df = reader.get_pm_db()
         
-        def process_pipeline_to_use(df):
-            pipeline = Pipeline([
-                ('feature_engineer', FeatureEngineering())
-            ])
-            df_pipeline = pipeline.fit_transform(df)
-            return df_pipeline
-        
-        return process_pipeline_to_use(df)
+        return self.__process_pipeline_to_use(df)
+    
+    def get_compare_indidividual_indicator_with_mean(self, student_row_id):
+        data = self.get_raw_data()
+        indicators_columns = [ 'inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian' ]
+        student_info = data[data['id'] == student_row_id][indicators_columns].T
+        student_info.reset_index(inplace=True)
+        student_info.columns = ['indicators', 'values']
+        student_info['type'] = 'Estudante'
+        phase_mean = round(data[data['phase'] == data[data['id'] == student_row_id].phase.values[0]][indicators_columns].mean(), 2).reset_index()
+        phase_mean.columns = ['indicators', 'values']
+        phase_mean['type'] = 'Média da fase'
+        return pd.concat([phase_mean, student_info])
+    
+    def get_historycal_inde(self, student_row_id):
+        data = self.get_raw_data()
+        student_ra = data[data['id'] == student_row_id].ra.values[0]
+        inde_historic = data[data['ra'] == student_ra][['ano_ref', 'inde']]
+        return inde_historic.round(2)
+    
+    def get_grades_history(self, student_row_id):
+        data = self.get_raw_data()
+        student_ra = data[data['id'] == student_row_id].ra.values[0]
+        grade_historic = data[data['ra'] == student_ra][['ano_ref', 'phase', 'mat', 'por', 'ing']]
+        grade_historic[['mat', 'por', 'ing']] = grade_historic[['mat', 'por', 'ing']].round(2).fillna('-')
+        grade_historic['ano_ref'] = grade_historic['ano_ref'].astype(str)
+        grade_historic['phase'] = grade_historic['phase'].astype(str)
+        grade_historic.sort_values(by='ano_ref', ascending=False, inplace=True)
+        grade_historic.rename(columns={
+            'mat': 'Matemática',
+            'por':'Português',
+            'ing': 'Inglês',
+            'ano_ref': 'Ano',
+            'phase': 'Fase'
+        }, inplace=True)
+        grade_historic.reset_index(inplace=True, drop=True)
+        return grade_historic
+    
+    def get_student_growing(self, student_row_id):
+        #Cálculo estatístico para entender se houve melhora (BASE DE NOTAS? INDE - PEDRAS?) desde a entrada na PM (desvio padrão?)
+        #USAR AS PEDRAS NOS VALORES DE INDICADORES
+        return
+    
+    def get_student_percentile(self, student_row_id):
+        #Cálculo estatístico para entender como se classifica o estudante em comparação aos demais, usar o INDE
+        #USAR AS PEDRAS NOS VALORES DE INDICADORES
+        #É ISSO E PARTIR PRA IA
+        return
+    
+
     
 class Cluster_controller:
     def __init__(self):
