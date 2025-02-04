@@ -10,7 +10,7 @@ indicators_columns = [
     
 ]
 
-class FeatureEngineeringToCluster(BaseEstimator, TransformerMixin):
+class FeatureEngineering(BaseEstimator, TransformerMixin):
     def __init__(self, indicators_features = ['inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian'], features_to_ajust = ['ra', 'ano_nasc', 'genero', 'instituicao_ensino', 'fase', 'defasagem', 'ano_ref']):
        self.indicators_features = indicators_features
        self.features_to_ajust = features_to_ajust
@@ -45,13 +45,13 @@ class FeatureEngineeringToCluster(BaseEstimator, TransformerMixin):
         return age
     
     def transform(self, df):
-        df = df[self.features_to_ajust + self.indicators_features]
         df.head()
         df['id'] = df.apply(lambda row: f"{row['ano_ref']}{row['ra']}", axis=1)
         print(df.columns)
         df['female'] = pd.to_numeric(df['genero'].apply(self.__ajust_gender_female))
         df['male'] = pd.to_numeric(df['genero'].apply(self.__ajust_gender_male))
         df['phase'] = pd.to_numeric(df['fase'].apply(self.__ajust_phase))
+        df['ideal_phase'] = pd.to_numeric(df['fase_ideal'].apply(self.__ajust_phase))
         df['public_school'] = pd.to_numeric(df['instituicao_ensino'].apply(self.__ajust_public_school))
         df['private_school'] = pd.to_numeric(df['instituicao_ensino'].apply(self.__ajust_public_private))
         df['age'] = pd.to_numeric(df['ano_nasc'].apply(self.__get_age_from_year))
@@ -65,8 +65,8 @@ class FeatureEngineeringToCluster(BaseEstimator, TransformerMixin):
         return df
 
 class FeatureSelectionToCluster(BaseEstimator, TransformerMixin):
-    def __init__(self, feature_to_remove=['female', 'male', 'public_school', 'private_school', 'ano_nasc', 'ano_ref'], phase_to_filter=-1):
-        self.feature_to_remove = feature_to_remove
+    def __init__(self, features_to_filter=['id', 'phase', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian'], phase_to_filter=-1):
+        self.features_to_filter = features_to_filter
         self.phase_to_filter = phase_to_filter
     
     def fit(self, df):
@@ -75,7 +75,7 @@ class FeatureSelectionToCluster(BaseEstimator, TransformerMixin):
     def transform(self, df):
         df = df[df['ano_ref'] > 2022]#removendo 2022 pela falta do ipp
         if(self.phase_to_filter > -1): df = df[df['phase'] == self.phase_to_filter]
-        df.drop(columns=self.feature_to_remove, inplace=True)
+        df = df[self.features_to_filter]
         return df
 
 class MinMaxScaleFeatureToCluster(BaseEstimator, TransformerMixin):

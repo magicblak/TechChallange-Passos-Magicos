@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from utils.clusterPipeline import FeatureEngineeringToCluster, FeatureSelectionToCluster, MinMaxScaleFeatureToCluster, DimensionalityReductionFeatureToCluster
+from utils.pipelines import FeatureEngineering, FeatureSelectionToCluster, MinMaxScaleFeatureToCluster, DimensionalityReductionFeatureToCluster
 from sklearn.pipeline import Pipeline
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -16,14 +16,13 @@ class Data_treatment_controller:
         
         def process_pipeline_to_use(df):
             pipeline = Pipeline([
-                ('feature_engineer', FeatureEngineeringToCluster())
+                ('feature_engineer', FeatureEngineering())
             ])
             df_pipeline = pipeline.fit_transform(df)
             return df_pipeline
         
         return process_pipeline_to_use(df)
-
-
+    
 class Cluster_controller:
     def __init__(self):
         pass
@@ -47,14 +46,17 @@ class Cluster_controller:
         #return processed_data
         return
     
-    def clustering(self):
-        reader = DataAccess()
-        df = reader.get_pm_db()
+    def get_filtered_data_to_cluster_by_student(self, df, selected_student, student_phase):
+        max_year = df['ano_ref'].max()
+        df_same_phase = df.query("(phase == @student_phase and ano_ref < @max_year and ano_ref > 2022) or (nome == @selected_student and ano_ref == @max_year)")
+        df_next_phase = df[df['ra'].isin(df_same_phase['ra']) & (df['phase'] == (student_phase + 1))]
+        return df_same_phase, df_next_phase
+    
+    def clustering(self, df):
 
         def process_pipeline_to_cluster(df):
             pipeline = Pipeline([
-                ('feature_engineer', FeatureEngineeringToCluster()),
-                ('feature_selection', FeatureSelectionToCluster(phase_to_filter=1)),
+                ('feature_selection', FeatureSelectionToCluster()),
                 ('min_max_scale', MinMaxScaleFeatureToCluster()),
                 ('dimensional_reduction', DimensionalityReductionFeatureToCluster()),
             ])
