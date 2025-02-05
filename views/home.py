@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.functions import create_title, create_section_title
+from utils.function import create_title, create_section_title
 
 
 create_title("Passos Mágicos")
