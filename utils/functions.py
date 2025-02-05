@@ -6,7 +6,7 @@ def create_title(text):
     st.markdown(f'<h1 style="color: #004580;">{text}</h1>', unsafe_allow_html=True)
     
 def create_section_title(text):
-    st.markdown(f'<h5 style="color: black;">{text}</h5>', unsafe_allow_html=True)
+    st.markdown(f'<h5>{text}</h5>', unsafe_allow_html=True)
 
 def create_dataframe_view_stylized(df, selected_index=None):
     def highlight_row(row):
@@ -72,14 +72,13 @@ def create_radar_polar_plot(data, r='values', theta='indicators', color='type', 
         font=dict(size=14),
         margin=dict(l=40, r=40, t=40, b=40),
         polar=dict(
-            bgcolor="white",
             radialaxis=dict(
                 showgrid=False,
                 showticklabels=False
             ),
             angularaxis=dict(
                 showgrid=False,
-                tickfont=dict(size=14, family='Arial, sans-serif', color='darkblue')
+                tickfont=dict(size=14)
             )
         ),
         plot_bgcolor="rgba(0,0,0,0)"
@@ -99,8 +98,7 @@ def create_line_chart_plot(data, x, y, labels, title='', range=[0, 10]):
     )
     fig.update_traces(line_width=4, line_color="#9370DB", marker=dict(size=10), textposition="top center")
     fig.update_layout(
-        plot_bgcolor="white",
-        title=dict(font=dict(size=16, color="black")),
+        title=dict(font=dict(size=16)),
         xaxis=dict(title_font=dict(size=14), tickvals=data[x].unique(), tickfont=dict(size=14)),
         yaxis=dict(title_font=dict(size=14), tickfont=dict(size=14), range=[3, 10])
     )
