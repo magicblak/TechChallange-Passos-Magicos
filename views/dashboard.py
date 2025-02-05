@@ -1,7 +1,6 @@
 import streamlit as st
 from utils.functions import create_title, create_section_title, create_dataframe_view_stylized, create_student_history, create_scatter_plot, create_radar_polar_plot, create_line_chart_plot
 from controllers.dasboard_controller import Cluster_controller, Data_treatment_controller
-import matplotlib.pyplot as plt
 import numpy as np
 
 create_title("Ficha do(a) estudante")
@@ -9,9 +8,50 @@ cluster_creator = Cluster_controller()
 data_treater = Data_treatment_controller()
 
 df_raw_data = data_treater.get_raw_data()
-active_student_list = df_raw_data[['id', 'nome']][(df_raw_data['situacao'] == 'Cursando') & (df_raw_data['phase'] < 8)]
+active_student_list = df_raw_data[['id', 'nome', 'phase', 'defasagem', 'male', 'female', 'public_school', 'private_school']][(df_raw_data['situacao'] == 'Cursando')]
 active_student_list.drop_duplicates(inplace=True)
 active_student_list.sort_values(by='nome', inplace=True)
+phase_list = ['selecione...', 0, 1, 2, 3, 4, 5, 6, 7, 8]
+diff_list = ['selecione...'] + sorted(active_student_list['defasagem'].unique())
+gender_list = ['selecione...', 'Masculino', 'Feminino']
+school_list = ['selecione...', 'Pública', 'Privada']
+
+selected_phase = st.selectbox(
+    "Selecione a fase:",
+    options=phase_list,
+    help='xxx'
+)
+
+selected_diff = st.selectbox(
+    "Selecione a defasagem:",
+    options=diff_list,
+    help='xxx'
+)
+
+selected_gender = st.selectbox(
+    "Selecione o sexo:",
+    options=gender_list,
+    help='xxx'
+)
+
+selected_school = st.selectbox(
+    "Selecione o tipo de escola:",
+    options=school_list,
+    help='xxx'
+)
+
+if(selected_phase != 'selecione...'):
+    active_student_list = active_student_list[active_student_list['phase'] == selected_phase]
+if(selected_diff != 'selecione...'):
+    active_student_list = active_student_list[active_student_list['defasagem'] == selected_diff]
+if(selected_gender == 'Masculino'):
+    active_student_list = active_student_list[active_student_list['male'] == 1]
+if(selected_gender == 'Feminino'):
+    active_student_list = active_student_list[active_student_list['female'] == 1]
+if(selected_school == 'Privada'):
+    active_student_list = active_student_list[active_student_list['private_school'] == 1]
+if(selected_school == 'Pública'):
+    active_student_list = active_student_list[active_student_list['public_school'] == 1]
 
 selected_student = st.selectbox(
     "Selecione o(a) estudante:",
@@ -32,7 +72,7 @@ if(selected_student != ''):
         ano_entrada=selected_student_info.ano_ingresso.values[0],
         escola=selected_student_info.escola.values[0],
         turma=selected_student_info.turma.values[0],
-        fase_ideal=selected_student_info.fase_ideal.values[0],
+        fase_ideal=selected_student_info.ideal_phase.values[0],
         situacao=selected_student_info.situacao.values[0],
         ra=selected_student_info.ra.values[0]
     )
@@ -49,7 +89,7 @@ if(selected_student != ''):
         ),
         use_container_width=True
     )
-    inde_history_data = data_treater.get_historycal_inde(student_row_id=selected_student_info.id.values[0])
+    inde_history_data = data_treater.get_historycal_indicators(student_row_id=selected_student_info.id.values[0])[['ano_ref', 'inde']]
     st.plotly_chart(
         create_line_chart_plot(
             data=inde_history_data,
@@ -64,6 +104,10 @@ if(selected_student != ''):
         use_container_width=True
     )
     create_dataframe_view_stylized(data_treater.get_grades_history(student_row_id=selected_student_info.id.values[0]))
+
+    st.write(data_treater.get_student_deciles(student_row_id=selected_student_info.id.values[0]))
+    st.dataframe(data_treater.get_student_growing(student_row_id=selected_student_info.id.values[0]))
+    st.write(data_treater.get_concept_stone_inde(student_row_id=selected_student_info.id.values[0]))
     
 
     if(selected_student_info['phase'].values[0] < 8):

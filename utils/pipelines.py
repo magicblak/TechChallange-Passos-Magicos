@@ -31,6 +31,18 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
         elif(phase == '9'): return 8
         return "".join(re.findall(r"\d+", str(phase)))
     
+    def __ajust_ideal_phase(self, phase):
+        if(phase == 'Fase 8 (Universitários)'): return 8
+        elif(phase == 'Fase 7 (3º EM)' or phase == 'Fase 7 (3° EM)'): return 7
+        elif(phase == 'Fase 6 (2º EM)' or phase == 'Fase 6 (2° EM)'): return 6
+        elif(phase == 'Fase 5 (1º EM)' or phase == 'Fase 5 (1° EM)'): return 5
+        elif(phase == 'Fase 4 (9º ano)' or phase == 'Fase 4 (9° ano)'): return 4
+        elif(phase == 'Fase 3 (7º e 8º ano)' or phase == 'Fase 3 (7° e 8° ano)'): return 3
+        elif(phase == 'Fase 2 (5º e 6º ano)' or phase == 'Fase 2 (5° e 6° ano)'): return 2
+        elif(phase == 'Fase 1 (4º ano)' or phase == 'Fase 1 (3° e 4° ano)'): return 1
+        elif(phase == 'ALFA  (2º e 3º ano)' or phase == 'ALFA (1° e 2° ano)'): return 0
+        return -1
+    
     def __ajust_public_school(self, shool):
         if(shool == 'Escola Pública' or shool == 'Pública'): return 1
         return 0
@@ -51,7 +63,7 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
         df['female'] = pd.to_numeric(df['genero'].apply(self.__ajust_gender_female))
         df['male'] = pd.to_numeric(df['genero'].apply(self.__ajust_gender_male))
         df['phase'] = pd.to_numeric(df['fase'].apply(self.__ajust_phase))
-        df['ideal_phase'] = pd.to_numeric(df['fase_ideal'].apply(self.__ajust_phase))
+        df['ideal_phase'] = pd.to_numeric(df['fase_ideal'].apply(self.__ajust_ideal_phase))
         df['public_school'] = pd.to_numeric(df['instituicao_ensino'].apply(self.__ajust_public_school))
         df['private_school'] = pd.to_numeric(df['instituicao_ensino'].apply(self.__ajust_public_private))
         df['age'] = pd.to_numeric(df['ano_nasc'].apply(self.__get_age_from_year))
