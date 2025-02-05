@@ -11,7 +11,8 @@ indicators_columns = [
 ]
 
 class FeatureEngineering(BaseEstimator, TransformerMixin):
-    def __init__(self, indicators_features = ['inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian'], features_to_ajust = ['ra', 'ano_nasc', 'genero', 'instituicao_ensino', 'fase', 'defasagem', 'ano_ref']):
+    def __init__(self, grades_features = ['mat', 'por', 'ing'], indicators_features = ['inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian'], features_to_ajust = ['ra', 'ano_nasc', 'genero', 'instituicao_ensino', 'fase', 'defasagem', 'ano_ref']):
+       self.grades_features = grades_features
        self.indicators_features = indicators_features
        self.features_to_ajust = features_to_ajust
     
@@ -59,7 +60,6 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
     def transform(self, df):
         df.head()
         df['id'] = df.apply(lambda row: f"{row['ano_ref']}{row['ra']}", axis=1)
-        print(df.columns)
         df['female'] = pd.to_numeric(df['genero'].apply(self.__ajust_gender_female))
         df['male'] = pd.to_numeric(df['genero'].apply(self.__ajust_gender_male))
         df['phase'] = pd.to_numeric(df['fase'].apply(self.__ajust_phase))
@@ -68,8 +68,8 @@ class FeatureEngineering(BaseEstimator, TransformerMixin):
         df['private_school'] = pd.to_numeric(df['instituicao_ensino'].apply(self.__ajust_public_private))
         df['age'] = pd.to_numeric(df['ano_nasc'].apply(self.__get_age_from_year))
         df.drop(columns=['genero', 'fase', 'instituicao_ensino'], inplace=True)
-        df[self.indicators_features] = (
-            df[self.indicators_features]
+        df[self.grades_features + self.indicators_features] = (
+            df[self.grades_features + self.indicators_features]
             .astype(str)
             .replace(",", '.', regex=True)
             .apply(pd.to_numeric, errors='coerce')

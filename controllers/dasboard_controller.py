@@ -34,7 +34,7 @@ class Data_treatment_controller:
         phase_mean = round(data[data['phase'] == data[data['id'] == student_row_id].phase.values[0]][indicators_columns].mean(), 2).reset_index()
         phase_mean.columns = ['indicators', 'values']
         phase_mean['type'] = 'Média da fase'
-        return pd.concat([phase_mean, student_info])
+        return round(pd.concat([phase_mean, student_info]), 2)
     
     def get_historycal_indicators(self, student_row_id):
         indicators_columns = [ 'inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian' ]
@@ -44,27 +44,28 @@ class Data_treatment_controller:
         return inde_historic.round(2)
     
     def get_grades_history(self, student_row_id):
+        def ajust_discipline(discipline):
+            if(discipline == 'mat'): return 'Matemática'
+            elif(discipline == 'por'): return 'Português'
+            elif(discipline == 'ing'): return 'Inglês'
         data = self.get_raw_data()
         student_ra = data[data['id'] == student_row_id].ra.values[0]
         grade_historic = data[data['ra'] == student_ra][['ano_ref', 'phase', 'mat', 'por', 'ing']]
-        grade_historic[['mat', 'por', 'ing']] = grade_historic[['mat', 'por', 'ing']].round(2).fillna('-')
+        grade_historic[['mat', 'por', 'ing']] = grade_historic[['mat', 'por', 'ing']].round(2)
         grade_historic['ano_ref'] = grade_historic['ano_ref'].astype(str)
         grade_historic['phase'] = grade_historic['phase'].astype(str)
-        grade_historic.sort_values(by='ano_ref', ascending=False, inplace=True)
+        grade_historic.sort_values(by='ano_ref', ascending=True, inplace=True)
+        grade_historic = grade_historic.melt(id_vars=['ano_ref', 'phase'], value_vars=['mat', 'por', 'ing'], value_name='grade', var_name='disicpline')
         grade_historic.rename(columns={
-            'mat': 'Matemática',
-            'por':'Português',
-            'ing': 'Inglês',
             'ano_ref': 'Ano',
             'phase': 'Fase'
         }, inplace=True)
+        grade_historic['grade'] = pd.to_numeric(grade_historic['grade'])
+        grade_historic['disicpline'] = grade_historic['disicpline'].apply(ajust_discipline)
         grade_historic.reset_index(inplace=True, drop=True)
-        return grade_historic
+        return round(grade_historic, 2)
     
     def get_student_growing(self, student_row_id):
-        #Cálculo estatístico para entender se houve melhora (BASE DE NOTAS? INDE - PEDRAS?) desde a entrada na PM (desvio padrão?)
-        #USAR AS PEDRAS NOS VALORES DE INDICADORES
-            # Objeto para armazenar as inclinações de cada indicador
         indicators_columns = [ 'inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian' ]
         variation = []
         indicators_historic = self.get_historycal_indicators(student_row_id).fillna(0)
@@ -73,19 +74,19 @@ class Data_treatment_controller:
             y = indicators_historic[indicador].values
             modelo = LinearRegression().fit(X, y)
             variation.append({'Indicador': indicador, 'Inclinação': modelo.coef_[0]})
-        return round(pd.DataFrame(variation), 2).T
+        return round(pd.DataFrame(variation), 2)
     
     def get_student_deciles(self, student_row_id):
-        #Cálculo estatístico para entender como se classifica o estudante em comparação aos demais, usar o INDE
-        #USAR AS PEDRAS NOS VALORES DE INDICADORES
-        #É ISSO E PARTIR PRA IA
         data = self.get_raw_data()
-        data['decile'] = pd.qcut(data['inde'], q=10, labels=[f'> {i}0%' for i in range(1, 11)])
+        student_phase = data[data['id'] == student_row_id].phase.values[0]
+        data = data[data['phase'] == student_phase]
+        data['inde'] = data['inde'].fillna(0)
+        data['decile'] = pd.qcut(data['inde'], q=100, labels=[f'{(i)}%' for i in range(1, 101)])
         student_info = data[data['id'] == student_row_id]
         return student_info['decile'].values[0]
     
     def get_concept_stone_inde(self, student_row_id):
-        inde_data = self.get_historycal_indicators(student_row_id)['inde'].values[0]
+        inde_data = self.get_historycal_indicators(student_row_id)['inde'].values[-1]
         if(inde_data < 6.1): return 'Quartzo'
         elif(inde_data >= 6.1 and inde_data < 7.2): return 'Ágata'
         elif(inde_data >= 7.2 and inde_data < 8.2): return 'Ametista'
