@@ -20,7 +20,7 @@ class StudentDashboardAgents():
             json_data = json.dumps(toml_data)
             keys = json.loads(json_data)
             os.environ["OPENAI_API_KEY"] = keys['OPENAI_KEY']
-            os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
+            os.environ["OPENAI_MODEL_NAME"] = 'gpt-4o-mini'
     
     def __create_agent(self, role, goal, backstory, tools=[]):
         agent = Agent(
