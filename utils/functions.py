@@ -41,6 +41,7 @@ def create_student_history(nome, inde, stone, percentile_data, idade, sexo, tipo
 
 def create_scatter_plot(x, y, c=None, labelX='', labelY='', title=''):
     data = pd.DataFrame({'x': x, 'y': y, 'color': c})
+    data['color'] = 'Grupo ' + data['color'].astype(str)
     fig = px.scatter(
     data, 
     x='x', 
