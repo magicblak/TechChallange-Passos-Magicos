@@ -156,6 +156,14 @@ if(selected_student != 'selecione...'):
             st.warning('Sem amostra o suficiente para seguir com predição')
         else:
             df_cluster, df_dimensioned_clustered = cluster_creator.clustering(df_same_phase)
+
+            df_same_phase_clustered = df_same_phase.merge(df_cluster[['id', 'cluster']], left_on='id', right_on='id', how='inner')
+            df_next_phase_clustered = df_next_phase.merge(df_same_phase_clustered[['ra', 'cluster']], left_on='ra', right_on='ra', how='inner')
+            student_cluster = df_same_phase_clustered[df_same_phase_clustered['nome'] == selected_student]['cluster'].values[0]
+                
+            agg_data = round(df_next_phase_clustered.groupby(by=['cluster'])[['inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian']].agg(['mean', 'std']), 2)
+            agg_data['count'] = df_next_phase_clustered.groupby(by='cluster').size()
+            agg_data.rename(columns={'cluster': 'Grupo'}, inplace=True)
             with st.expander("Detalhes do agrupamento (Cluster) - Clique para expandir"):
                 create_scatter_plot(
                     x=df_dimensioned_clustered[:, 0], 
@@ -165,15 +173,7 @@ if(selected_student != 'selecione...'):
                     labelY='Componente Principal 2', 
                     title='K-Means após PCA para 2D'
                 )
-
-            df_same_phase_clustered = df_same_phase.merge(df_cluster[['id', 'cluster']], left_on='id', right_on='id', how='inner')
-            df_next_phase_clustered = df_next_phase.merge(df_same_phase_clustered[['ra', 'cluster']], left_on='ra', right_on='ra', how='inner')
-            student_cluster = df_same_phase_clustered[df_same_phase_clustered['nome'] == selected_student]['cluster'].values[0]
-                
-            agg_data = round(df_next_phase_clustered.groupby(by=['cluster'])[['inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian']].agg(['mean', 'std']), 2)
-            agg_data['count'] = df_next_phase_clustered.groupby(by='cluster').size()
-            agg_data.rename(columns={'cluster': 'Grupo'}, inplace=True)
-            create_dataframe_view_stylized(agg_data, student_cluster)
+                create_dataframe_view_stylized(agg_data, student_cluster)
     else:
         st.warning('O(a) estudante já se encontra na última fase')
 
@@ -233,6 +233,6 @@ if(selected_student != 'selecione...'):
                 indicators_explanation=general_context + indicators_explanation,
                 cluster_explanation=general_context + cluster_explanation
             )
-            st.markdown(result['raw'])
+            st.markdown(result.raw)
 else:
     st.warning('Selecione um estudante para ver o detalhe.')
