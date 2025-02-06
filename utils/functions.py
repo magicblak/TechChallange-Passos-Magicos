@@ -46,7 +46,6 @@ def create_scatter_plot(x, y, c=None, labelX='', labelY='', title=''):
     x='x', 
     y='y', 
     color='color',
-    color_continuous_scale='rainbow',
     labels={'x': labelX, 'y': labelY}, 
     title=title
     )

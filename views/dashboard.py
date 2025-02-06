@@ -171,6 +171,7 @@ if(selected_student != 'selecione...'):
                 
             agg_data = round(df_next_phase_clustered.groupby(by=['cluster'])[['inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian']].agg(['mean', 'std']), 2)
             agg_data['count'] = df_next_phase_clustered.groupby(by='cluster').size()
+            agg_data.rename(columns={'cluster': 'Grupo'}, inplace=True)
             create_dataframe_view_stylized(agg_data, student_cluster)
     else:
         st.warning('O(a) estudante já se encontra na última fase')
@@ -224,13 +225,13 @@ if(selected_student != 'selecione...'):
         4. filtragem dos alunos que possuem resultados da próxima fase para compara com o estudante: {agg_data.to_string(index=False)}
     """
     with st.spinner(f"Analisando dados... Isso pode levar alguns minutos."):
-        agents = StudentDashboardAgents()
-        result = agents.request_analysis(
-            base_explain=general_context,
-            indicators_explanation=general_context + indicators_explanation,
-            cluster_explanation=general_context + cluster_explanation
-        )
-        st.write(result)
-        print(result)
+        with st.expander("Storytelling do(a) estudante - Clique para expandir"):
+            agents = StudentDashboardAgents()
+            result = agents.request_analysis(
+                base_explain=general_context,
+                indicators_explanation=general_context + indicators_explanation,
+                cluster_explanation=general_context + cluster_explanation
+            )
+            st.markdown(result['raw'])
 else:
     st.warning('Selecione um estudante para ver o detalhe.')

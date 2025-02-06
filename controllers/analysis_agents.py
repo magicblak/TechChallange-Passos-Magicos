@@ -98,7 +98,7 @@ class StudentDashboardAgents():
         coach_task = self.__create_task(
             agent=coach,
             description="""Construir um storytelling do aluno por meio de informações do time de dados, e consolidar todas as análises em linguagem educacional seja de clusterização ou idicadores de desempenho acadêmico""" + base_explain,
-            expected_output="Texto em formato de storytelling para contar a história existente do aluno presente nos numeros, e plano de ação considerando a consolidação das análises em linguagem educacional, contendo: o futura análisado na clusterização e o presente e passado análisado nos inidicadores para potencializar e/ou auxiliar o launo"
+            expected_output="Texto em formato de storytelling, com o público alvo coordenadores e diretores de uma escola de ensino básico, para contar a história existente do aluno presente nos numeros, e plano de ação considerando a consolidação das análises em linguagem educacional, contendo: o futura análisado na clusterização e o presente e passado análisado nos inidicadores para potencializar e/ou auxiliar o launo"
         )
 
         crew = self.__create_crew(
