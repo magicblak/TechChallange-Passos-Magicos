@@ -1,11 +1,8 @@
 import streamlit as st
 import json
-import chromadb
-
-client = chromadb.Client()
-collection = client.get_collection(name="chroma_docs")
-results = collection.get(ids=["page"])["documents"]
-print(results) # Not found []
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 
 # Leitura de itens do menu
