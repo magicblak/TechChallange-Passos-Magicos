@@ -46,6 +46,7 @@ def create_scatter_plot(x, y, c=None, labelX='', labelY='', title=''):
     x='x', 
     y='y', 
     color='color',
+    color_discrete_sequence=px.colors.qualitative.Set1,
     labels={'x': labelX, 'y': labelY}, 
     title=title
     )

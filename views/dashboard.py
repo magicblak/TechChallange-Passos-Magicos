@@ -156,14 +156,15 @@ if(selected_student != 'selecione...'):
             st.warning('Sem amostra o suficiente para seguir com predição')
         else:
             df_cluster, df_dimensioned_clustered = cluster_creator.clustering(df_same_phase)
-            create_scatter_plot(
-                x=df_dimensioned_clustered[:, 0], 
-                y=df_dimensioned_clustered[:, 1], 
-                c=df_cluster['cluster'], 
-                labelX='Componente Principal 1', 
-                labelY='Componente Principal 2', 
-                title='K-Means após PCA para 2D'
-            )
+            with st.expander("Detalhes do agrupamento (Cluster) - Clique para expandir"):
+                create_scatter_plot(
+                    x=df_dimensioned_clustered[:, 0], 
+                    y=df_dimensioned_clustered[:, 1], 
+                    c=df_cluster['cluster'], 
+                    labelX='Componente Principal 1', 
+                    labelY='Componente Principal 2', 
+                    title='K-Means após PCA para 2D'
+                )
 
             df_same_phase_clustered = df_same_phase.merge(df_cluster[['id', 'cluster']], left_on='id', right_on='id', how='inner')
             df_next_phase_clustered = df_next_phase.merge(df_same_phase_clustered[['ra', 'cluster']], left_on='ra', right_on='ra', how='inner')
