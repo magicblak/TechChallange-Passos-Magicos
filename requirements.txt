@@ -23,6 +23,7 @@ plotly==5.16.1
 #IA Agents & Models
 crewai
 crewai-tools
+sqlite3 
 pysqlite3-binary
 pysqlite3
 
