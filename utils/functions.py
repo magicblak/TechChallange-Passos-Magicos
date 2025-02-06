@@ -16,16 +16,16 @@ def create_dataframe_view_stylized(df, selected_index=None):
             return [''] * len(row)
     st.dataframe(df.style.apply(highlight_row, axis=1))
 
-def create_student_history(nome, inde, stone, decile, idade, sexo, tipo_escola, fase, ano_entrada, escola, turma, fase_ideal, situacao, ra):
+def create_student_history(nome, inde, stone, percentile_data, idade, sexo, tipo_escola, fase, ano_entrada, escola, turma, fase_ideal, situacao, ra):
     with st.container():
         create_section_title(f"{str.upper(nome)} ({ra})")
-        if(stone != None and decile != None):
-            colimg, colstone, colinde, coldecile = st.columns([1,3,3,3])
+        if(stone != None and percentile_data != None):
+            colimg, colstone, colinde, colpercentile_data = st.columns([1,3,3,3])
             with colimg:
                 st.image(f"./assets/{stone}.png", use_container_width=True)
             colstone.metric("Pedra-conceito atual", stone)
             colinde.metric("INDE", inde)
-            coldecile.metric("Percentil - INDE", decile, help="INDE superior a X% dos estudantes de mesma fase")
+            colpercentile_data.metric("Percentil - INDE", percentile_data, help="INDE superior a X% dos estudantes de mesma fase")
         col1, col2, col3, col4 = st.columns(4)
         col1.metric("Idade", idade)
         col2.metric("Sexo", sexo)

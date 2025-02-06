@@ -76,7 +76,7 @@ class Data_treatment_controller:
             variation.append({'Indicador': indicador, 'Inclinação': modelo.coef_[0]})
         return round(pd.DataFrame(variation), 2)
     
-    def get_student_deciles(self, student_row_id):
+    def get_student_percentile(self, student_row_id):
         data = self.get_raw_data()
         student_phase = data[data['id'] == student_row_id].phase.values[0]
         data = data[data['phase'] == student_phase]
@@ -149,7 +149,6 @@ class Cluster_controller:
             wss_diff = np.diff(elbow)
             wss_diff2 = np.diff(wss_diff)
             elbow = np.argmax(-wss_diff2) + 2
-            print(max(silhouette))
             silhouette = silhouette.index(max(silhouette)) + 2
             return elbow, silhouette
         
