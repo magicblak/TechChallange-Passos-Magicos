@@ -13,14 +13,6 @@ from utils.functions import (
 from controllers.dasboard_controller import Cluster_controller, Data_treatment_controller
 import numpy as np
 from controllers.analysis_agents import StudentDashboardAgents
-import asyncio
-
-
-async def analyze_student_data(agents, indicators_explanation, cluster_explanation):
-    result = await asyncio.to_thread(
-        agents.request_analysis, indicators_explanation, cluster_explanation
-    )
-    return result
 
 create_title("Ficha do(a) estudante")
 cluster_creator = Cluster_controller()
@@ -231,13 +223,14 @@ if(selected_student != 'selecione...'):
         3. clusterização com dados de alunos de mesma turma, cluster do estudante: {student_cluster} resultado da clusterização: {df_cluster.to_string(index=False)}
         4. filtragem dos alunos que possuem resultados da próxima fase para compara com o estudante: {agg_data.to_string(index=False)}
     """
-    agents = StudentDashboardAgents()
-    result = asyncio.run(analyze_student_data(
-        agents,
-        indicators_explanation=general_context + indicators_explanation,
-        cluster_explanation=general_context + cluster_explanation
-    ))
-    st.write(result)
-    print(result)
+    with st.spinner(f"Analisando dados... Isso pode levar alguns minutos."):
+        agents = StudentDashboardAgents()
+        result = agents.request_analysis(
+            base_explain=general_context,
+            indicators_explanation=general_context + indicators_explanation,
+            cluster_explanation=general_context + cluster_explanation
+        )
+        st.write(result)
+        print(result)
 else:
     st.warning('Selecione um estudante para ver o detalhe.')
