@@ -22,4 +22,4 @@ plotly==5.16.1
 
 #IA Agents & Models
 crewai==0.100.1
-crewai-tools==0.33.0
+crewai-tools==0.28.8
