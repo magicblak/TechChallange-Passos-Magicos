@@ -63,47 +63,64 @@ class StudentDashboardAgents():
     def request_analysis(self, base_explain, indicators_explanation, cluster_explanation):
         self.__get_credentials()
 
-        indicator_explorer = self.__create_agent(
-            role="Especialista de Dados de Desempenho Acadêmico",
-            goal="Observar e analisar os dados de desempenho acadêmico, buscando nuances que podem ser importantes na captura de comportamento do aluno",
-            backstory=f"""Especialista em avaliar a jornada acadêmica no ensino básico, adora identificar lacunas e oportunidades de crescimento por meio de dados objetivos. 
+        data_explorer = self.__create_agent(
+            role="Especialista de Dados de Educacionais",
+            goal="Construir análises educacionais robustas para análise de Orientadores Educacionais",
+            backstory=f"""Especialista em analisar dados para construir uma visualização da 
+                jornada acadêmica de estudantes do ensino básico, 
+                adora identificar lacunas e oportunidades de crescimento por meio de dados. 
                 Focado em trazer insights precisos, mas com empatia.
-                Trabalha em uma ong que possui algumas informações importantes: {base_explain}"""
+                {base_explain}"""
         )
-        cluster_explorer = self.__create_agent(
-            role="Especialista em Clusterização e Padrões",
-            goal="Fornecer insights sobre como o comportamento do grupo onde o aluno se encontra e qual relação existe com os demais grupos, seja relação de igualdade ou divergência",
-            backstory=f"""Especialista em predição e análise de padrões/comportamento, adora identificar lacunas e oportunidades de crescimento por meio de dados objetivos. 
-                Focado em trazer insights precisos, mas com empatia.
-                Trabalha em uma ong que possui algumas informações importantes: {base_explain}"""
+        educational_coah = self.__create_agent(
+            role="Orientador Educacional",
+            goal="""Interpretar análises educacionais com o objetivo de construir a jornada do
+                estudante na instituição de ensino, e buscar hipoteses para aprimoramento dos resultados
+                do estudante.""",
+            backstory=f"""Trabalha a 20 anos com estudantes em situação de vulnerabilidade social
+                e de baixa renda, seu trabalho sempre foi reconhecido pelo seu olhar humanizado, e acompanhamento
+                detalhado de estudantes, além de ser referência em elaboração de hipoteses para apoiar decisões
+                da coordenação pedagógica. Além disso, é estremamente questionador e crítico quanto aos dados, adicionalmente
+                é estremamente questionador e busca exelência em todo o trabalho que executa.
+                {base_explain}"""
         )
-        coach = self.__create_agent(
-            role="Mentor Pedagógico Individual",
-            goal="Propor ações específicas de apoio e desenvolvimento pedagógico, considerando as áreas de dificuldade e pontos fortes do aluno.",
-            backstory=f"""Um orientador com experiência prática em sala de aula, preocupado com o desenvolvimento integral dos alunos na ONG. Ele traduz dados em história
-                para que educadores possam avaliar e tomar ações
-                Trabalha em uma ong que possui algumas informações importantes: {base_explain}"""
+        educational_communicator = self.__create_agent(
+            role="Assistente Pedagógico",
+            goal="Consolidar toda análise da jornado do estudante, organizando as informações e preparando um relatório objetivo para o coordenador pedagógico.",
+            backstory=f"""Com mais de 10 anos de experiência tem alta competência em organizar análises educacionais
+                em formato de storytelling profissional para que o coordenador pedagógico receba uma consolidação
+                organizada, coesa, humana e objetiva contemplando toda os aspectos que compõem uma jornada educacional.
+                {base_explain}"""
         )
 
-        indicator_explorer_task = self.__create_task(
-            agent=indicator_explorer,
-            description="Avaliar as notas e indicadores de aprendizagem do aluno e/ou comparando seu desempenho com a média da turma. Identificar pontos fortes e áreas de dificuldade." + indicators_explanation,
-            expected_output="Relatório em texto apresentando evidências de lacunas e potenciais do estudante, incluindo análises longitudinais e comparativas, observando não só os indicadores, como também as notas de discplina do aluno (inglês, português e matemática)."
+        data_explorer_task = self.__create_task(
+            agent=data_explorer,
+            description=f"""Análisar dados do desempenho acadêmico, indicadores e comparações
+                de 1 estudante e criar uma análise educacional individualizada.
+                Dados: {indicators_explanation}
+                Após a análise, deve-se elaborar uma predição de resultados com base na
+                análise de cluster, tentando entender qual o padrão de comportanmento do estudante análisado
+                Cluster: {cluster_explanation}""",
+            expected_output="Relatório completo abordando todos os tópicos observados para análise educacional do Orientado Pedagógico."
         )
-        cluster_explorer_task = self.__create_task(
-            agent=cluster_explorer,
-            description="Analisar o cluster ao qual o aluno pertence e identificar padrões de desempenho associados a esse grupo. Comparar suas características principais com outros alunos do mesmo cluster. E quais principais caracteristicas do melhor clustes em desempenho acadêmico." + cluster_explanation,
-            expected_output="Relatório em texto da análise de cluster, contendo padrões identificados e possibilidades de previsão futura, com a comparação de alunos que já passaram pela mesma fase."
+        educational_coach_task = self.__create_task(
+            agent=educational_coah,
+            description="""Receber a análise de dados educacionais, questionando o Analista de dados educaionais
+                caso haja necessidade de complemento na análise e criar um relatório completo da jornada do estudante contendo incusive hipoteses
+                para melhoria de desempenho e/ou incentivo do desempenho atual""",
+            expected_output="Jornada completa do estudante contendo todas os destaques positivos/negativos, além de hipoteses para aprimorar ou manter o desempenho dos estudantes."
         )
-        coach_task = self.__create_task(
-            agent=coach,
-            description="""Construir um storytelling do aluno por meio de informações do time de dados, e consolidar todas as análises em linguagem educacional seja de clusterização ou idicadores de desempenho acadêmico""" + base_explain,
-            expected_output="Texto em português brasileiro formato de storytelling (1m de leitura), com o público alvo coordenadores e diretores de uma escola de ensino básico, para contar a história existente do aluno presente nos numeros, e plano de ação considerando a consolidação das análises em linguagem educacional, contendo: o futura análisado na clusterização e o presente e passado análisado nos inidicadores para potencializar e/ou auxiliar o launo"
+        communicator_task = self.__create_task(
+            agent=educational_communicator,
+            description="""Consolidação do relatório de Jornada completa do estudante,
+                organizando, destacando e deixando o texto mais objetivo
+                para análise do Coordenador Pedagógico.""",
+            expected_output="Relatório humanizado da análise educacional e jornada completa do estudante"
         )
 
         crew = self.__create_crew(
-            agents=[indicator_explorer, cluster_explorer, coach],
-            tasks=[indicator_explorer_task, cluster_explorer_task, coach_task]
+            agents=[data_explorer, educational_coah, communicator_task],
+            tasks=[data_explorer_task, educational_coach_task, communicator_task]
         )
 
         return crew.kickoff()

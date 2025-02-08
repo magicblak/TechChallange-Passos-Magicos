@@ -178,13 +178,12 @@ if(selected_student != 'selecione...'):
         st.warning('O(a) estudante já se encontra na última fase')
 
     general_context = f"""
+        Trabalham para ONG Passos Mágicos, e atuam com estudantes do municipio de embu-guaço, todos de baixa renda e em situação de vulnerabilidade.
+        A ONG tem a caracteristica de atuar de forma humanizada, e entende que a educação move o mundo e transforma pessoas.
+        Possui um programa de aceleração do conhecimento, que conta com aulas de português, matemática e inglês (são os unicos dados de desempenho acadêmico que a ONG tabalha e análisa)
+        Atua exclusivamente no ensino básico.
 
-        Toda essa avaliação está resultando do trabalho de um ONG que oferece aulas de alfabetização, língua portuguesa e matemática para crianças e adolescentes, de 7 a 17 anos, 
-        que sejam baixa renda e moradores do município de Embu-Guaçu. 
-        Os alunos são divididos por nível de conhecimento, determinado por meio de uma prova de sondagem que é realizada ao ingressarem na Passos Mágicos, 
-        e são inseridos em turmas que variam da alfabetização até o nível 8.
-
-        As fases são os momentos de cada estudante, perceba que também se tratam da série desses estudantes
+        Fases são os momentos de cada estudante, perceba que também se tratam da série desses estudantes
         Fase 0: Destinadas a alunos que estejam em fase de alfabetização ou que apresentem dificuldade na leitura e na escrita
         Fase 1 e 2: Focadas em conteúdo do ensino fundamental 1, sendo explorados com mais detalhes de um nível para o outro
         Fase 3 e 4: Focadas em conteúdo do ensino fundamental 2, sendo explorado com mais detalhes de um nível para o outro
@@ -202,28 +201,27 @@ if(selected_student != 'selecione...'):
         INDE (Índice de Desenvolvimento Educacional) Fórmula (FASE 0 A 7): IAN*0,1+IDA*0,2+IEG*0,2+IAA*0,1+IPS*0,1+IPP*0,1+IPV*0,2 Fórmula (FASE 8): IAN*0,1+IDA*0,4+IEG*0,2+IAA*0,1+IPS*0,2
         O INDE é o indicador principal e composto pelos demais
 
-        Informações e análises do(a) estudante:
-        Informações adicionais: {selected_student_info[['inde', 'age', 'male', 'female', 'public_school', 'private_school', 'phase', 'ideal_phase']].to_string(index=False)}
-
     """
 
     indicators_explanation = f""""
-
-        Comparação de indicadores do(a) estudante e média de outros(as) estudantes da mesma fase: {radar_plot_values.to_string(index=False)}
-        Evolução do INDE do(a) estudante: {inde_history_data.to_string(index=False)}
-        Evolução do(a) indicadores: {grow_data.to_string(index=False)}
-        Notas de disciplina do(a) estudantes: {grade_data.to_string(index=False)}
-        Posição no percentil do INDE em comparação com alunos da mesma fase: {percentile_data}
+        Informações e análises do(a) estudante:
+        Informações adicionais: {selected_student_info[['inde', 'age', 'male', 'female', 'public_school', 'private_school', 'phase', 'ideal_phase']].to_string(index=False)}
+        Dados de desempenho educacional abrengendo todos os indicadores e os dados acadêmicos de português, inglês e matemática.
+        Comparação dos indicadores do(a) estudante com o resultado da média de estudantes da mesma fase: {radar_plot_values.to_string(index=False)}
+        Evolução temporal do INDE do(a) estudante: {inde_history_data.to_string(index=False)}
+        Evolução dos indicadores, cálculados por meio de LinearRegression, do(a) estudante: {grow_data.to_string(index=False)}
+        Notas das disciplinas por ano: {grade_data.to_string(index=False)}
+        Percentil do(a) estudante: {percentile_data}
 
     """
     cluster_explanation = f""""
-        clusterização considerando alunos que já cursaram a fase do estudante selecionado, o cluster está olhando para a próxima fase do aluno, afim de prever possíveis comportamentos futuros.
-        Atente-se, pois a análise de cluster é desconsiderada para alunos da fase 8
-        As etapas realizada foram:
-        1. tratamento de dados
-        2. redimencionammento com PCA bidimencional
-        3. clusterização com dados de alunos de mesma turma, cluster do estudante: {student_cluster} resultado da clusterização: {df_cluster.to_string(index=False)}
-        4. filtragem dos alunos que possuem resultados da próxima fase para compara com o estudante: {agg_data.to_string(index=False)}
+        Informações e análises do(a) estudante:
+        Informações adicionais: {selected_student_info[['inde', 'age', 'male', 'female', 'public_school', 'private_school', 'phase', 'ideal_phase']].to_string(index=False)}
+        Clusterização para identificar se o estudante possui algum padrão observado.
+        Os resultados da clusterização são:
+        * Grupo(Cluster) do(a) estudante selecionado(a): {student_cluster}
+        * Agrupamento(Cluster) dos alunos que cursaram a mesma fase do(a) estudante selecionado(a): {df_cluster.to_string(index=False)}
+        * Resultado dos indicadores de estudantes que concluiram a próxima fase do(a) estudante selecionado(a), buscando a projeção futura do desempenho do estudante: {agg_data.to_string(index=False)}
     """
     with st.spinner(f"Analisando dados... Isso pode levar alguns minutos."):
         with st.expander("Storytelling do(a) estudante - Clique para expandir"):
