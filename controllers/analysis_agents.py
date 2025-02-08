@@ -119,7 +119,7 @@ class StudentDashboardAgents():
         )
 
         crew = self.__create_crew(
-            agents=[data_explorer, educational_coah, communicator_task],
+            agents=[data_explorer, educational_coah, educational_communicator],
             tasks=[data_explorer_task, educational_coach_task, communicator_task]
         )
 
