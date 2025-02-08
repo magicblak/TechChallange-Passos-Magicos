@@ -228,8 +228,8 @@ if(selected_student != 'selecione...'):
             agents = StudentDashboardAgents()
             result = agents.request_analysis(
                 base_explain=general_context,
-                indicators_explanation=general_context + indicators_explanation,
-                cluster_explanation=general_context + cluster_explanation
+                indicators_explanation=indicators_explanation,
+                cluster_explanation=cluster_explanation
             )
             st.markdown(result.raw)
 else:

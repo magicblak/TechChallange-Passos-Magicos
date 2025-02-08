@@ -73,8 +73,8 @@ class StudentDashboardAgents():
                 {base_explain}"""
         )
         educational_coah = self.__create_agent(
-            role="Orientador Educacional",
-            goal="""Interpretar análises educacionais com o objetivo de construir a jornada do
+            role=f"Orientador Educacional",
+            goal=f"""Interpretar análises educacionais com o objetivo de construir a jornada do
                 estudante na instituição de ensino, e buscar hipoteses para aprimoramento dos resultados
                 do estudante.""",
             backstory=f"""Trabalha a 20 anos com estudantes em situação de vulnerabilidade social
@@ -85,8 +85,8 @@ class StudentDashboardAgents():
                 {base_explain}"""
         )
         educational_communicator = self.__create_agent(
-            role="Assistente Pedagógico",
-            goal="Consolidar toda análise da jornado do estudante, organizando as informações e preparando um relatório objetivo para o coordenador pedagógico.",
+            role=f"Assistente Pedagógico",
+            goal=f"Consolidar toda análise da jornado do estudante, organizando as informações e preparando um relatório objetivo para o coordenador pedagógico.",
             backstory=f"""Com mais de 10 anos de experiência tem alta competência em organizar análises educacionais
                 em formato de storytelling profissional para que o coordenador pedagógico receba uma consolidação
                 organizada, coesa, humana e objetiva contemplando toda os aspectos que compõem uma jornada educacional.
@@ -105,14 +105,14 @@ class StudentDashboardAgents():
         )
         educational_coach_task = self.__create_task(
             agent=educational_coah,
-            description="""Receber a análise de dados educacionais, questionando o Analista de dados educaionais
+            description=f"""Receber a análise de dados educacionais, questionando o Analista de dados educaionais
                 caso haja necessidade de complemento na análise e criar um relatório completo da jornada do estudante contendo incusive hipoteses
                 para melhoria de desempenho e/ou incentivo do desempenho atual""",
             expected_output="Jornada completa do estudante contendo todas os destaques positivos/negativos, além de hipoteses para aprimorar ou manter o desempenho dos estudantes."
         )
         communicator_task = self.__create_task(
             agent=educational_communicator,
-            description="""Consolidação do relatório de Jornada completa do estudante,
+            description=f"""Consolidação do relatório de Jornada completa do estudante,
                 organizando, destacando e deixando o texto mais objetivo
                 para análise do Coordenador Pedagógico.""",
             expected_output="Relatório humanizado da análise educacional e jornada completa do estudante"
