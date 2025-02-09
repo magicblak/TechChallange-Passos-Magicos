@@ -20,6 +20,10 @@ create_title("Ficha do(a) estudante")
 cluster_creator = Cluster_controller()
 data_treater = Data_treatment_controller()
 
+student_cluster = None
+agg_data = pd.DataFrame()
+df_cluster = pd.DataFrame()
+
 df_raw_data = data_treater.get_raw_data()
 active_student_list = df_raw_data[['id', 'nome', 'phase', 'defasagem', 'male', 'female', 'public_school', 'private_school', 'inde']][(df_raw_data['situacao'] == 'Cursando')]
 active_student_list.drop_duplicates(inplace=True)
@@ -159,9 +163,8 @@ if(selected_student != 'selecione...'):
                 y='grade',
                 color='Ano',
                 title='Evolução absoluta das disciplinas'
-            ))  
-
-    student_cluster, agg_data, df_cluster = None, None, None
+            ))
+    
     if(selected_student_info['phase'].values[0] < 8):
         df_same_phase, df_next_phase = cluster_creator.get_filtered_data_to_cluster_by_student(df_raw_data, selected_student, selected_student_info['phase'].values[0])
         if(len(df_same_phase) < 50):
