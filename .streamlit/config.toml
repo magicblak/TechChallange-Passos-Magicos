@@ -1,13 +1,6 @@
-[logger]
-level = "debug"  # Can be "info", "debug", or "warning"
-
 [server]
 headless = true
 runOnSave = true
 server.maxMessageSize = 1000000
 server.port = 8501
 fileWatcherType = "none"
-
-[watchdog]
-watch_files = false
-ignored_directories = ["__pycache__", ".venv", "venv", ".git", "Lib", "site-packages"]
