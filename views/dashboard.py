@@ -13,6 +13,7 @@ from utils.functions import (
 )
 from controllers.dasboard_controller import Cluster_controller, Data_treatment_controller
 import numpy as np
+import pandas as pd
 from controllers.analysis_agents import StudentDashboardAgents
 import asyncio
 
@@ -20,7 +21,7 @@ create_title("Ficha do(a) estudante")
 cluster_creator = Cluster_controller()
 data_treater = Data_treatment_controller()
 
-student_cluster = None
+student_cluster = 'Sem cluster'
 agg_data = pd.DataFrame()
 df_cluster = pd.DataFrame()
 
