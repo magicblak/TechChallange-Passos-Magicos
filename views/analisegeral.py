@@ -3,13 +3,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import streamlit as st
+from models.data_access import DataAccess
 
 ##### Dados #####
 
 def load_data():
-    file_path = r'C:\Users\FabiaBocayuva\Documents\Python Scripts\Streamlit_App\PEDE 2024 - DATATHON - PEDE2024.csv'
-    df = pd.read_csv(file_path)
-    
+    leitor = DataAccess()
+    df = leitor.get_orig()
+
     # Converter colunas de INDE para numérico
     inde_columns = ['INDE 2024', 'INDE 23', 'INDE 22', 'IAA', 'IEG', 'IPS', 'IPP', 'IDA', 'IPV', 'IAN']
     for col in inde_columns:

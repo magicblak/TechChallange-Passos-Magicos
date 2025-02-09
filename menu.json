@@ -11,6 +11,12 @@
         "icon": "account_circle:",
         "default": 0
     },
+    "analisegeral":{
+        "title": "Análise Geral",
+        "file": "analisegeral.py",
+        "icon": "analytics:",
+        "default": 0
+    },
     "ficha-aluno":{
         "title": "Ficha estudante",
         "file": "dashboard.py",
