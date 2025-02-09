@@ -161,7 +161,7 @@ if(selected_student != 'selecione...'):
                 title='Evolução absoluta das disciplinas'
             ))  
 
-    
+    student_cluster, agg_data, df_cluster = None, None, None
     if(selected_student_info['phase'].values[0] < 8):
         df_same_phase, df_next_phase = cluster_creator.get_filtered_data_to_cluster_by_student(df_raw_data, selected_student, selected_student_info['phase'].values[0])
         if(len(df_same_phase) < 50):
