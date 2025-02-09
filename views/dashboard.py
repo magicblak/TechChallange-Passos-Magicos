@@ -176,7 +176,7 @@ if(selected_student != 'selecione...'):
             df_same_phase_clustered = df_same_phase.merge(df_cluster[['id', 'cluster']], left_on='id', right_on='id', how='inner')
             df_next_phase_clustered = df_next_phase.merge(df_same_phase_clustered[['ra', 'cluster']], left_on='ra', right_on='ra', how='inner')
             student_cluster = df_same_phase_clustered[df_same_phase_clustered['nome'] == selected_student]['cluster'].values[0]
-                
+            df_cluster.drop(columns=['id'], inplace=True)
             agg_data = round(df_next_phase_clustered.groupby(by=['cluster'])[['inde', 'iaa', 'ieg', 'ips', 'ipp', 'ida', 'ipv', 'ian']].agg(['mean', 'std']), 2)
             agg_data['count'] = df_next_phase_clustered.groupby(by='cluster').size()
             agg_data.rename(columns={'cluster': 'Grupo'}, inplace=True)
@@ -240,7 +240,7 @@ if(selected_student != 'selecione...'):
         Clusterização para identificar se o estudante possui algum padrão observado.
         Os resultados da clusterização são:
         * Grupo(Cluster) do(a) estudante selecionado(a): {student_cluster}
-        * Agrupamento(Cluster) dos alunos que cursaram a mesma fase do(a) estudante selecionado(a): {df_cluster.drop(columns=['id']).to_string(index=False)}
+        * Agrupamento(Cluster) dos alunos que cursaram a mesma fase do(a) estudante selecionado(a): {df_cluster.to_string(index=False)}
         * Resultado dos indicadores de estudantes que concluiram a próxima fase do(a) estudante selecionado(a), buscando a projeção futura do desempenho do estudante: {agg_data.to_string(index=False)}
     """
     with st.spinner(f"Analisando dados... Isso pode levar alguns minutos."):
