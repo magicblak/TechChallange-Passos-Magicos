@@ -22,6 +22,7 @@ cluster_creator = Cluster_controller()
 data_treater = Data_treatment_controller()
 
 student_cluster = 'Sem cluster'
+percentile_data = 'Sem cálculo de percentil'
 agg_data = pd.DataFrame()
 df_cluster = pd.DataFrame()
 
