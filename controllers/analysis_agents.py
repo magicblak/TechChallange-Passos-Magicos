@@ -9,6 +9,7 @@ from crewai_tools import SerperDevTool
 import tomli
 import json
 import os
+import asyncio
 
 class StudentDashboardAgents():
     def __init__(self):
@@ -26,7 +27,7 @@ class StudentDashboardAgents():
         agent = Agent(
             role=role,
             goal=goal,
-            memory=False,
+            memory=True,
             backstory=(
                 backstory
             ),
@@ -55,13 +56,13 @@ class StudentDashboardAgents():
             memory=True,
             cache=True,
             max_rpm=50,
-            max_execution_time=5000,
+            max_execution_time=50000,
             verbose=True,
             share_crew=True
         )
         return crew
     
-    def request_analysis(self, base_explain, indicators_explanation, cluster_explanation):
+    async def request_analysis(self, base_explain, indicators_explanation, cluster_explanation):
         self.__get_credentials()
 
         data_explorer = self.__create_agent(
@@ -71,6 +72,7 @@ class StudentDashboardAgents():
                 jornada acadêmica de estudantes do ensino básico, 
                 adora identificar lacunas e oportunidades de crescimento por meio de dados. 
                 Focado em trazer insights precisos, mas com empatia.
+                Seu trabalho visto com excelência, pois você descomplica termos técnicos, e elabora análises de forma democrática e assecivel.
                 {base_explain}"""
         )
         educational_coah = self.__create_agent(
@@ -83,14 +85,6 @@ class StudentDashboardAgents():
                 detalhado de estudantes, além de ser referência em elaboração de hipoteses para apoiar decisões
                 da coordenação pedagógica. Além disso, é estremamente questionador e crítico quanto aos dados, adicionalmente
                 é estremamente questionador e busca exelência em todo o trabalho que executa.
-                {base_explain}"""
-        )
-        educational_communicator = self.__create_agent(
-            role=f"Assistente Pedagógico",
-            goal=f"Consolidar toda análise da jornado do estudante, organizando as informações e preparando um relatório objetivo para o coordenador pedagógico.",
-            backstory=f"""Com mais de 10 anos de experiência tem alta competência em organizar análises educacionais
-                em formato de storytelling profissional para que o coordenador pedagógico receba uma consolidação
-                organizada, coesa, humana e objetiva contemplando toda os aspectos que compõem uma jornada educacional.
                 {base_explain}"""
         )
 
@@ -110,21 +104,13 @@ class StudentDashboardAgents():
             description=f"""Receber a análise de dados educacionais, questionando o Analista de dados educaionais
                 caso haja necessidade de complemento na análise e criar um relatório completo da jornada do estudante contendo incusive hipoteses
                 para melhoria de desempenho e/ou incentivo do desempenho atual""",
-            expected_output="Jornada completa do estudante contendo todas os destaques positivos/negativos, além de hipoteses para aprimorar ou manter o desempenho dos estudantes.",
+            expected_output="Jornada completa do estudante formatada para Markdown contendo todas os destaques positivos/negativos, além de hipoteses para aprimorar ou manter o desempenho dos estudantes. O Relatório deve estar organizado para leitura do Coordenador Pedagógico, e deve possuir 2 minutos de leitura no máximo",
             context=[data_explorer_task]
-        )
-        communicator_task = self.__create_task(
-            agent=educational_communicator,
-            description=f"""Consolidação do relatório de Jornada completa do estudante,
-                organizando, destacando e deixando o texto mais objetivo
-                para análise do Coordenador Pedagógico.""",
-            expected_output="Relatório formatado para Markdown humanizado da análise educacional e jornada completa do estudante de leitura máxima 2 minutos",
-            context=[educational_coach_task]
         )
 
         crew = self.__create_crew(
-            agents=[data_explorer, educational_coah, educational_communicator],
-            tasks=[data_explorer_task, educational_coach_task, communicator_task]
+            agents=[data_explorer, educational_coah],
+            tasks=[data_explorer_task, educational_coach_task]
         )
 
         return crew.kickoff()
