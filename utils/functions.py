@@ -8,13 +8,8 @@ def create_title(text):
 def create_section_title(text):
     st.markdown(f'<h5>{text}</h5>', unsafe_allow_html=True)
 
-def create_dataframe_view_stylized(df, selected_index=None):
-    def highlight_row(row):
-        if row.name == selected_index:
-            return ['background-color: #b8dbfc'] * len(row)
-        else:
-            return [''] * len(row)
-    st.dataframe(df.style.apply(highlight_row, axis=1))
+def create_dataframe_view_stylized(df):
+    st.dataframe(df)
 
 def create_student_history(nome, inde, stone, percentile_data, idade, sexo, tipo_escola, fase, ano_entrada, escola, turma, fase_ideal, situacao, ra):
     with st.container():

@@ -119,7 +119,7 @@ if(selected_student != 'selecione...'):
             st.plotly_chart(
                 create_line_chart_plot(
                     data=inde_history_data,
-                    title='Evolução do INDE',
+                    title='Evolução absoluta do INDE',
                     x='ano_ref',
                     y='inde',
                     labels={
@@ -137,7 +137,7 @@ if(selected_student != 'selecione...'):
                 data=grow_data, 
                 x='Indicador', 
                 y='Inclinação', 
-                title='Evolução do(a) estudante nos indicadores'
+                title='Têndencia dos indicadores'
             ))
         with col_grade:
             grade_data = data_treater.get_grades_history(student_row_id=selected_student_info.id.values[0])
@@ -146,7 +146,7 @@ if(selected_student != 'selecione...'):
                 x='disicpline', 
                 y='grade',
                 color='Ano',
-                title='Evolução do(a) estudante nos indicadores'
+                title='Evolução absoluta das disciplinas'
             ))  
 
     
@@ -171,9 +171,13 @@ if(selected_student != 'selecione...'):
                     c=df_cluster['cluster'], 
                     labelX='Componente Principal 1', 
                     labelY='Componente Principal 2', 
-                    title='K-Means após PCA para 2D'
+                    title='Cluster de estudantes da mesma fase'
                 )
-                create_dataframe_view_stylized(agg_data, student_cluster)
+                st.markdown('#### Tabela de projeção de desempenho da próxima fase')
+                create_dataframe_view_stylized(agg_data)
+                st.markdown(f'#### Grupo do(a) estudante: {student_cluster}')
+                st.markdown('Ao observar o comportamento Grupo do estudante na tabela acima, podemos estimar qual o resultado esperado do aluno na próxima fase.')
+                st.markdown(f'**Explicação:** O agrupamento por cluster(K-means) observa os indicadores de estudantes da fase {selected_student_info['phase'].values[0]}, enquanto a tabela agrega os indicadores dos(as) estudantes dos Grupos definidos que cursarama fase seguinte para estimar o desempenho médio do(a) estudante.')
     else:
         st.warning('O(a) estudante já se encontra na última fase')
 
@@ -220,7 +224,7 @@ if(selected_student != 'selecione...'):
         Clusterização para identificar se o estudante possui algum padrão observado.
         Os resultados da clusterização são:
         * Grupo(Cluster) do(a) estudante selecionado(a): {student_cluster}
-        * Agrupamento(Cluster) dos alunos que cursaram a mesma fase do(a) estudante selecionado(a): {df_cluster.to_string(index=False)}
+        * Agrupamento(Cluster) dos alunos que cursaram a mesma fase do(a) estudante selecionado(a): {df_cluster.drop(columns=['id']).to_string(index=False)}
         * Resultado dos indicadores de estudantes que concluiram a próxima fase do(a) estudante selecionado(a), buscando a projeção futura do desempenho do estudante: {agg_data.to_string(index=False)}
     """
     with st.spinner(f"Analisando dados... Isso pode levar alguns minutos."):

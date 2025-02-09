@@ -35,7 +35,7 @@ class StudentDashboardAgents():
         )
         return agent
     
-    def __create_task(self, agent, description, expected_output, tools=[]):
+    def __create_task(self, agent, description, expected_output, tools=[], context=[]):
         task = Task(
             description=(
                 description
@@ -43,6 +43,7 @@ class StudentDashboardAgents():
             expected_output=expected_output,
             tools=tools,
             agent=agent,
+            context=context
         )
         return task
     
@@ -97,6 +98,7 @@ class StudentDashboardAgents():
             agent=data_explorer,
             description=f"""Análisar dados do desempenho acadêmico, indicadores e comparações
                 de 1 estudante e criar uma análise educacional individualizada.
+                Se houver dúvidas sobre a interpretação dos dados observados, consulte o Orientador Educacional.
                 Dados: {indicators_explanation}
                 Após a análise, deve-se elaborar uma predição de resultados com base na
                 análise de cluster, tentando entender qual o padrão de comportanmento do estudante análisado
@@ -108,14 +110,16 @@ class StudentDashboardAgents():
             description=f"""Receber a análise de dados educacionais, questionando o Analista de dados educaionais
                 caso haja necessidade de complemento na análise e criar um relatório completo da jornada do estudante contendo incusive hipoteses
                 para melhoria de desempenho e/ou incentivo do desempenho atual""",
-            expected_output="Jornada completa do estudante contendo todas os destaques positivos/negativos, além de hipoteses para aprimorar ou manter o desempenho dos estudantes."
+            expected_output="Jornada completa do estudante contendo todas os destaques positivos/negativos, além de hipoteses para aprimorar ou manter o desempenho dos estudantes.",
+            context=[data_explorer_task]
         )
         communicator_task = self.__create_task(
             agent=educational_communicator,
             description=f"""Consolidação do relatório de Jornada completa do estudante,
                 organizando, destacando e deixando o texto mais objetivo
                 para análise do Coordenador Pedagógico.""",
-            expected_output="Relatório humanizado da análise educacional e jornada completa do estudante"
+            expected_output="Relatório formatado para Markdown humanizado da análise educacional e jornada completa do estudante de leitura máxima 2 minutos",
+            context=[educational_coach_task]
         )
 
         crew = self.__create_crew(
