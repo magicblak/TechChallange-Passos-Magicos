@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from crewai import Crew
 
 def create_title(text):
     st.markdown(f'<h1 style="color: #004580;">{text}</h1>', unsafe_allow_html=True)
@@ -155,3 +156,6 @@ def create_bar_chart_for_grades(data, x, y, color, title=''):
         )
     )
     return fig
+
+async def kickoff_crew(crew):
+    return crew.kickoff()

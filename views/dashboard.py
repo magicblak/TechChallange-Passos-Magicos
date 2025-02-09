@@ -8,7 +8,8 @@ from utils.functions import (
     create_radar_polar_plot, 
     create_line_chart_plot, 
     create_relative_bar_chart_for_growth, 
-    create_bar_chart_for_grades
+    create_bar_chart_for_grades,
+    kickoff_crew
 )
 from controllers.dasboard_controller import Cluster_controller, Data_treatment_controller
 import numpy as np
@@ -241,11 +242,12 @@ if(selected_student != 'selecione...'):
     with st.spinner(f"Analisando dados... Isso pode levar alguns minutos."):
         with st.expander("Storytelling do(a) estudante - Clique para expandir"):
             agents = StudentDashboardAgents()
-            result = asyncio.run(agents.request_analysis(
+            crew = asyncio.run(agents.request_analysis(
                 base_explain=general_context,
                 indicators_explanation=indicators_explanation,
                 cluster_explanation=cluster_explanation
             ))
+            result = asyncio.run(kickoff_crew(crew))
             st.markdown(result.raw)
 else:
     st.warning('Selecione um estudante para ver o detalhe.')

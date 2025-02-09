@@ -5,11 +5,9 @@ from crewai import (
     Process,
     Crew
 )
-from crewai_tools import SerperDevTool
 import tomli
 import json
 import os
-import asyncio
 
 class StudentDashboardAgents():
     def __init__(self):
@@ -113,4 +111,4 @@ class StudentDashboardAgents():
             tasks=[data_explorer_task, educational_coach_task]
         )
 
-        return crew.kickoff()
+        return crew
