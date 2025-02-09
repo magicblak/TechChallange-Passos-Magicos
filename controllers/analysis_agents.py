@@ -102,7 +102,7 @@ class StudentDashboardAgents():
             description=f"""Receber a análise de dados educacionais, questionando o Analista de dados educaionais
                 caso haja necessidade de complemento na análise e criar um relatório completo da jornada do estudante contendo incusive hipoteses
                 para melhoria de desempenho e/ou incentivo do desempenho atual""",
-            expected_output="Jornada completa do estudante formatada para Markdown contendo todas os destaques positivos/negativos, além de hipoteses para aprimorar ou manter o desempenho dos estudantes. O Relatório deve estar organizado para leitura do Coordenador Pedagógico, e deve possuir 2 minutos de leitura no máximo",
+            expected_output="Jornada completa do estudante em texto formatada para Markdown e 100% em português brasileiro contendo todas os destaques positivos/negativos, além de hipoteses para aprimorar ou manter o desempenho dos estudantes. O Relatório deve estar organizado para leitura do Coordenador Pedagógico, e deve possuir 2 minutos de leitura no máximo",
             context=[data_explorer_task]
         )
 
