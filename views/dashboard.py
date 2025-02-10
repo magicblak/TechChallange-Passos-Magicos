@@ -100,7 +100,7 @@ if(selected_student != 'selecione...'):
         ra=selected_student_info.ra.values[0]
     )
     with st.expander("Tradução dos indicadores - clique para expandir"):
-        st.markdown('####Composição e significado dos indicadores')
+        st.markdown('#### Composição e significado dos indicadores')
         st.markdown('IAN (Indicador de Adequação de Nível) Fórmula: D = Fase Efetiva - Fase Ideal, sendo D>= 0 Em fase(IAN=10), 0>D>-2 Moderada(IAN=5) e D<-2 severa(IAN=2,5)')
         st.markdown('IDA (Indicador de Desempenho Acadêmico) Fórmula: IDA = (Nota Matemática + Nota Português + Nota Inglês) / 3')
         st.markdown('IEG (Indicador de Engajamento) Fórmula: IEG = Soma das pontuações das tarefas realizadas e registradas / Número de tarefas')
@@ -108,7 +108,8 @@ if(selected_student != 'selecione...'):
         st.markdown('IPS (Indicador Psicossocial) Fórmula: IPS = Soma das pontuações dos avaliadores / Número de avaliadores PS: Avaliações feitas por psicólogos (comportamental, emocional, social)')
         st.markdown('IPP (Indicador Psicopedagógico) Fórmula: IPP = Soma das avaliações sobre aspectos pedagógicos ​/ Número de avaliações')
         st.markdown('IPV (Indicador do Ponto de Virada) Fórmula: IPV = Análises longitudinais de progresso acadêmico, engajamento e desenvolvimento emocional')
-        st.markdown('INDE (Índice de Desenvolvimento Educacional) Fórmula (FASE 0 A 7): IAN*0,1+IDA*0,2+IEG*0,2+IAA*0,1+IPS*0,1+IPP*0,1+IPV*0,2 Fórmula (FASE 8): IAN*0,1+IDA*0,4+IEG*0,2+IAA*0,1+IPS*0,2')
+        st.markdown('INDE (Índice de Desenvolvimento Educacional) Fórmula (FASE 0 A 7): IAN*0,1+IDA*0,2+IEG*0,2+IAA*0,1+IPS*0,1+IPP*0,1+IPV*0,2')
+        st.markdown('Fórmula (FASE 8): IAN*0,1+IDA*0,4+IEG*0,2+IAA*0,1+IPS*0,2')
     with st.expander("Análise educacional - Clique para expandir"):
         st.write('Passe o mouse no gráfico e clique para expandir se necessário.')
         col_radar_plot, col_inde_history = st.columns([1,1.2])
