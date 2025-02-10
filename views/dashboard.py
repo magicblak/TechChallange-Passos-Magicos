@@ -17,6 +17,7 @@ import pandas as pd
 from controllers.analysis_agents import StudentDashboardAgents
 import asyncio
 
+st.success("Você pode selecionar qualquer estudante, mas, para fins de teste, sugerimos os **Aluno-924** e **Aluno-1000**, pois apresentam dois bons contrapontos.")
 create_title("Ficha do(a) estudante")
 cluster_creator = Cluster_controller()
 data_treater = Data_treatment_controller()
