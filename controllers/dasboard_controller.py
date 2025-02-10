@@ -81,9 +81,10 @@ class Data_treatment_controller:
         student_phase = data[data['id'] == student_row_id].phase.values[0]
         data = data[data['phase'] == student_phase]
         data['inde'] = data['inde'].fillna(0)
-        data['decile'] = pd.qcut(data['inde'], q=100, labels=[f'{(i)}%' for i in range(1, 101)])
+        data['inde'] = data['inde'] + np.random.uniform(0, 1e-5, size=len(data['inde']))
+        data['percentile'] = pd.qcut(data['inde'], q=100, labels=[f'{(i)}%' for i in range(1, 101)])
         student_info = data[data['id'] == student_row_id]
-        return student_info['decile'].values[0]
+        return student_info['percentile'].values[0]
     
     def get_concept_stone_inde(self, student_row_id):
         inde_data = self.get_historycal_indicators(student_row_id)['inde'].values[-1]

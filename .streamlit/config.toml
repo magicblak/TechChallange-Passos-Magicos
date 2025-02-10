@@ -1,6 +1,0 @@
-[server]
-headless = true
-runOnSave = true
-server.maxMessageSize = 1000000
-server.port = 8501
-fileWatcherType = "none"
