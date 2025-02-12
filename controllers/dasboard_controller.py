@@ -81,7 +81,7 @@ class Data_treatment_controller:
         student_phase = data[data['id'] == student_row_id].phase.values[0]
         data = data[data['phase'] == student_phase]
         data['inde'] = data['inde'].fillna(0)
-        data['decile'] = pd.qcut(data['inde'], q=100, labels=[f'{(i)}%' for i in range(1, 101)])
+        data['decile'] = pd.qcut(data['inde'], q=min(100, len(data['inde'].unique())), labels=[f'{i}%' for i in range(1, min(101, len(data['inde'].unique()) + 1))])
         student_info = data[data['id'] == student_row_id]
         return student_info['decile'].values[0]
     
