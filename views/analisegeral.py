@@ -99,7 +99,7 @@ with st.expander("Distribuição dos alunos na classificação de Pedra-conceito
     col1, col2, col3, col4 = st.columns(4)
 
     icons = {
-        "Topázio": "&#x1F48E;",  # ícone de ouro (representação de um diamante/joia)
+        "Topázio": "<img src=\"./assets/Topázio.png\" width=\"40px\">",  # ícone de ouro (representação de um diamante/joia)
         "Ametista": "&#x1F4A5;",  # ícone de ametista (representação de um símbolo de impacto ou brilho)
         "Agata": "&#x1F52E;",     # ícone de ágata (representação de uma pedra)
         "Quartzo": "&#x1F48C;"    # ícone de quartzo (representação de uma joia)
