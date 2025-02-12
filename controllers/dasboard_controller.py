@@ -81,7 +81,12 @@ class Data_treatment_controller:
         student_phase = data[data['id'] == student_row_id].phase.values[0]
         data = data[data['phase'] == student_phase]
         data['inde'] = data['inde'].fillna(0)
-        data['decile'] = pd.qcut(data['inde'], q=min(100, len(data['inde'].unique())), labels=[f'{i}%' for i in range(1, min(101, len(data['inde'].unique()) + 1))])
+        if(len(data['inde'].unique()) >= 100):
+            data['decile'] = pd.qcut(data['inde'], q=100, labels=[f'{i}%' for i in range(1, 101)])
+        elif(len(data['inde'].unique()) >= 10):
+            data['decile'] = pd.qcut(data['inde'], q=10, labels=[f'{i}%' for i in range(1, 11)])
+        else:
+            data['decile'] = 'Sem percentil'
         student_info = data[data['id'] == student_row_id]
         return student_info['decile'].values[0]
     
