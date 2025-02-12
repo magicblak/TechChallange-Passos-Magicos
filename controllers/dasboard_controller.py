@@ -76,19 +76,21 @@ class Data_treatment_controller:
             variation.append({'Indicador': indicador, 'Inclinação': modelo.coef_[0]})
         return round(pd.DataFrame(variation), 2)
     
-    def get_student_percentile(self, student_row_id):
-        data = self.get_raw_data()
-        student_phase = data[data['id'] == student_row_id].phase.values[0]
-        data = data[data['phase'] == student_phase]
-        data['inde'] = data['inde'].fillna(0)
-        if(len(data['inde'].unique()) >= 100):
-            data['decile'] = pd.qcut(data['inde'], q=100, labels=[f'{i}%' for i in range(1, 101)])
-        elif(len(data['inde'].unique()) >= 10):
-            data['decile'] = pd.qcut(data['inde'], q=10, labels=[f'{i}%' for i in range(1, 11)])
-        else:
-            data['decile'] = 'Sem percentil'
-        student_info = data[data['id'] == student_row_id]
-        return student_info['decile'].values[0]
+def get_student_percentile(self, student_row_id):
+    data = self.get_raw_data()
+    student_phase = data.loc[data['id'] == student_row_id, 'phase'].values[0]
+    data = data[data['phase'] == student_phase]
+    data['inde'] = pd.to_numeric(data['inde'], errors='coerce').fillna(0)
+    unique_values = len(data['inde'].unique())
+    if unique_values >= 100:
+        q = 100
+    elif unique_values >= 10:
+        q = 10
+    else:
+        return "Sem percentil"  # Not enough data for percentile calculation
+    data['decile'] = pd.qcut(data['inde'], q=q, labels=[f'{i}%' for i in range(1, q + 1)], duplicates="drop")
+    student_info = data.loc[data['id'] == student_row_id, 'decile']
+    return student_info.values[0] if not student_info.empty else "Sem percentil"
     
     def get_concept_stone_inde(self, student_row_id):
         inde_data = self.get_historycal_indicators(student_row_id)['inde'].values[-1]
