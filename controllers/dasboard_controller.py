@@ -92,12 +92,12 @@ def get_student_percentile(self, student_row_id):
     student_info = data.loc[data['id'] == student_row_id, 'decile']
     return student_info.values[0] if not student_info.empty else "Sem percentil"
     
-    def get_concept_stone_inde(self, student_row_id):
-        inde_data = self.get_historycal_indicators(student_row_id)['inde'].values[-1]
-        if(inde_data < 6.1): return 'Quartzo'
-        elif(inde_data >= 6.1 and inde_data < 7.2): return 'Ágata'
-        elif(inde_data >= 7.2 and inde_data < 8.2): return 'Ametista'
-        elif(inde_data >= 8.2): return 'Topázio'
+def get_concept_stone_inde(self, student_row_id):
+    inde_data = self.get_historycal_indicators(student_row_id)['inde'].values[-1]
+    if(inde_data < 6.1): return 'Quartzo'
+    elif(inde_data >= 6.1 and inde_data < 7.2): return 'Ágata'
+    elif(inde_data >= 7.2 and inde_data < 8.2): return 'Ametista'
+    elif(inde_data >= 8.2): return 'Topázio'
     
 
     
