@@ -35,7 +35,8 @@ phase_list = ['selecione...', 0, 1, 2, 3, 4, 5, 6, 7, 8]
 diff_list = ['selecione...'] + sorted(active_student_list['defasagem'].unique())
 gender_list = ['selecione...', 'Masculino', 'Feminino']
 school_list = ['selecione...', 'Pública', 'Privada']
-create_section_title("Filtros de busca")
+create_section_title("Filtros")
+st.markdown('Utilize os filtros para buscar o "Estudante" de acordo com a necessidade. (Opcional)')
 col_phase, col_diff, col_gender, col_School = st.columns(4)
 with col_phase:
     selected_phase = st.selectbox(
@@ -75,6 +76,8 @@ if(selected_school == 'Privada'):
 if(selected_school == 'Pública'):
     active_student_list = active_student_list[active_student_list['public_school'] == 1]
 
+create_section_title("Seleção de estudante")
+st.markdown('Selecione o estudante para visualizar a ficha completa.')
 student_name_list = ['selecione...'] + active_student_list['nome'].tolist()
 selected_student = st.selectbox(
     "Estudante:",
@@ -106,16 +109,6 @@ if(selected_student != 'selecione...'):
         situacao=selected_student_info.situacao.values[0],
         ra=selected_student_info.ra.values[0]
     )
-    with st.expander("Tradução dos indicadores - clique para expandir"):
-        st.markdown('####Composição e significado dos indicadores')
-        st.markdown('IAN (Indicador de Adequação de Nível) Fórmula: D = Fase Efetiva - Fase Ideal, sendo D>= 0 Em fase(IAN=10), 0>D>-2 Moderada(IAN=5) e D<-2 severa(IAN=2,5)')
-        st.markdown('IDA (Indicador de Desempenho Acadêmico) Fórmula: IDA = (Nota Matemática + Nota Português + Nota Inglês) / 3')
-        st.markdown('IEG (Indicador de Engajamento) Fórmula: IEG = Soma das pontuações das tarefas realizadas e registradas / Número de tarefas')
-        st.markdown('IAA (Indicador de Autoavaliação) Fórmula: IAA = Soma das pontuações das respostas do estudante / Número total de perguntas')
-        st.markdown('IPS (Indicador Psicossocial) Fórmula: IPS = Soma das pontuações dos avaliadores / Número de avaliadores PS: Avaliações feitas por psicólogos (comportamental, emocional, social)')
-        st.markdown('IPP (Indicador Psicopedagógico) Fórmula: IPP = Soma das avaliações sobre aspectos pedagógicos ​/ Número de avaliações')
-        st.markdown('IPV (Indicador do Ponto de Virada) Fórmula: IPV = Análises longitudinais de progresso acadêmico, engajamento e desenvolvimento emocional')
-        st.markdown('INDE (Índice de Desenvolvimento Educacional) Fórmula (FASE 0 A 7): IAN*0,1+IDA*0,2+IEG*0,2+IAA*0,1+IPS*0,1+IPP*0,1+IPV*0,2 Fórmula (FASE 8): IAN*0,1+IDA*0,4+IEG*0,2+IAA*0,1+IPS*0,2')
     with st.expander("Análise educacional - Clique para expandir"):
         st.write('Passe o mouse no gráfico e clique para expandir se necessário.')
         col_radar_plot, col_inde_history = st.columns([1,1.2])
@@ -246,7 +239,7 @@ if(selected_student != 'selecione...'):
         * Resultado dos indicadores de estudantes que concluiram a próxima fase do(a) estudante selecionado(a), buscando a projeção futura do desempenho do estudante: {agg_data.to_string(index=False)}
     """
     with st.spinner(f"Analisando dados... Isso pode levar alguns minutos."):
-        with st.expander("Storytelling do(a) estudante - Clique para expandir"):
+        with st.expander("Relatório de análise educacional - Clique para expandir"):
             agents = StudentDashboardAgents()
             crew = asyncio.run(agents.request_analysis(
                 base_explain=general_context,
@@ -255,5 +248,19 @@ if(selected_student != 'selecione...'):
             ))
             result = asyncio.run(kickoff_crew(crew))
             st.markdown(result.raw)
+    with st.expander("Tradução dos indicadores - clique para expandir"):
+        st.markdown('#### Composição e significado dos indicadores')
+        indicadores = [
+            ("IAN", "Indicador de Adequação de Nível", "D = Fase Efetiva - Fase Ideal, sendo D>= 0 Em fase(IAN=10), 0>D>-2 Moderada(IAN=5) e D<-2 severa(IAN=2,5)"),
+            ("IDA", "Indicador de Desempenho Acadêmico", "IDA = (Nota Matemática + Nota Português + Nota Inglês) / 3"),
+            ("IEG", "Indicador de Engajamento", "IEG = Soma das pontuações das tarefas realizadas e registradas / Número de tarefas"),
+            ("IAA", "Indicador de Autoavaliação", "IAA = Soma das pontuações das respostas do estudante / Número total de perguntas"),
+            ("IPS", "Indicador Psicossocial", "IPS = Soma das pontuações dos avaliadores / Número de avaliadores (avaliações feitas por psicólogos - comportamental, emocional, social)"),
+            ("IPP", "Indicador Psicopedagógico", "IPP = Soma das avaliações sobre aspectos pedagógicos / Número de avaliações"),
+            ("IPV", "Indicador do Ponto de Virada", "IPV = Análises longitudinais de progresso acadêmico, engajamento e desenvolvimento emocional"),
+            ("INDE", "Índice de Desenvolvimento Educacional", "Fórmula (FASE 0 A 7): IAN*0,1+IDA*0,2+IEG*0,2+IAA*0,1+IPS*0,1+IPP*0,1+IPV*0,2 | Fórmula (FASE 8): IAN*0,1+IDA*0,4+IEG*0,2+IAA*0,1+IPS*0,2")
+        ]
+        df = pd.DataFrame(indicadores, columns=["Sigla", "Indicador", "Fórmula"])
+        st.table(df)
 else:
     st.warning('Selecione um estudante para ver o detalhe.')
