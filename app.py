@@ -1,9 +1,8 @@
 import streamlit as st
 import json
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
+#__import__('pysqlite3')
+#import sys
+#sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Leitura de itens do menu
 file_path = 'menu.json'

@@ -159,3 +159,14 @@ def create_bar_chart_for_grades(data, x, y, color, title=''):
 
 async def kickoff_crew(crew):
     return crew.kickoff()
+
+def create_about_member(name, image, linkedin, presentation):
+    col1, col2 = st.columns([1,3])
+
+    with col1:
+        st.image(f"./assets/{image}.png", width=150)
+
+    with col2:
+        create_section_title(name)
+        st.markdown(presentation)
+        st.markdown(f'[Linkedin]({linkedin})')
