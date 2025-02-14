@@ -7,12 +7,12 @@ from models.data_access import DataAccess
 
 ##### Dados #####
 
+inde_columns = ['INDE 2024', 'INDE 23', 'INDE 22', 'IAA', 'IEG', 'IPS', 'IPP', 'IDA', 'IPV', 'IAN']
 def load_data():
     leitor = DataAccess()
     df = leitor.get_orig()
 
     # Converter colunas de INDE para numérico
-    inde_columns = ['INDE 2024', 'INDE 23', 'INDE 22', 'IAA', 'IEG', 'IPS', 'IPP', 'IDA', 'IPV', 'IAN']
     for col in inde_columns:
         df[col] = df[col].astype(str).str.replace(',', '.')
         df[col] = pd.to_numeric(df[col], errors='coerce')
@@ -22,158 +22,150 @@ def load_data():
 df = load_data()
 df = df.drop(columns=['Cg','Cf','Ct','Rec Av1','Rec Av2','Rec Psicologia','Indicado','Atingiu PV','Destaque IEG','Destaque IDA','Destaque IPV'])
 
-##### Página Streamlit ####
-# Configuração de estilo
-st.set_page_config(layout="wide", page_title="Dashboard de Alunos")
-
-plt.style.use('bmh')
-sns.set_palette("pastel")
-
-# Criar a barra de menu
-menu = ["Análises Gerais", "Análise do Aluno", "Análise do Avaliador"]
-escolha = st.sidebar.radio("Selecione uma página:", menu)
+##### Página Streamlit ###########################################################################################
 
 # Página: Análises Gerais
-if escolha == "Análises Gerais":
-    st.title("📊 Análises Gerais")
-    st.markdown("---")
+st.title("📊 Análises Gerais")
+st.write("Nesta página você encontra um resumo das informações mais relevantes sobre a performance dos alunos da Passos Mágicos em 2024.")
+st.markdown("---")
 
-    # 1. Quantidade de alunos
-    total_alunos = df['Nome Anonimizado'].nunique()
-    st.metric(label="Total de Alunos", value=total_alunos)
-    # Cartões - Médias dos INDE ao longo dos anos
+# Quantidade de alunos por gênero #############################################################################
+gender_counts = df['Gênero'].value_counts()
+col1, col2, col3 = st.columns(3)
+icon_total = "&#x1F464;"  # Unicode para o ícone de boneco (total)
+icon_feminino = "&#x1F467;"  # Unicode para o ícone de menina
+icon_masculino = "&#x1F466;"  # Unicode para o ícone de menino
+col1.markdown(f"<h3>{icon_total} Total de alunos</h3>", unsafe_allow_html=True)
+col1.metric(label="", value=gender_counts.sum())
+col2.markdown(f"<h3>{icon_feminino} Feminino</h3>", unsafe_allow_html=True)
+col2.metric(label="", value=gender_counts.get('Feminino', 0))
+col3.markdown(f"<h3>{icon_masculino} Masculino</h3>", unsafe_allow_html=True)
+col3.metric(label="", value=gender_counts.get('Masculino', 0))
+
+with st.expander("Análise Geral das médias dos indicadores e comparação com anos anteriores"):
+    st.write("A evolução do INDE (Índice de Desenvolvimento Educacional) dos alunos ativos da PM entre os anos de 2022 e 2024 não teve variação significante, se mantendo na média de 7.41 entre os anos.")
+    # Cartões - Médias dos índices ao longo dos anos ##############################################################
     mean_indes = {
         '2022': df['INDE 22'].mean(),
         '2023': df['INDE 23'].mean(),
         '2024': df['INDE 2024'].mean()
     }
 
-    st.markdown("### Médias dos INDE ao longo dos anos")
-    col6, col7, col8 = st.columns(3)
-    colunas = [col6, col7, col8]
     years = list(mean_indes.keys())
-    values = list(mean_indes.values())
+    values = [f"{v:.2f}" for v in mean_indes.values()]  # Format as string for display
+    variations = ["-"]  # First year has no variation
 
-    for i in range(len(values)):
-        if i > 0:
-            change = ((values[i] - values[i-1]) / values[i-1]) * 100
-            var_text = f"<p>Variação: {change:.2f}%</p>"
-        else:
-            var_text = ""
-        colunas[i].markdown(f"<div class='metric-container'><h2>{years[i]}</h2><h1>{values[i]:.2f}</h1>{var_text}</div>", unsafe_allow_html=True)
+    for i in range(1, len(values)):
+        change = ((float(values[i]) - float(values[i - 1])) / float(values[i - 1])) * 100
+        variations.append(f"{change:.2f}%")  # Append variation
+
+    df_table = pd.DataFrame({
+        "Ano": years,
+        "Média INDE": values,
+        "Variação (%)": variations
+    })
+
+    st.markdown("<h4 style='font-size:16px;'>Médias dos INDE ao longo dos anos</h4>", unsafe_allow_html=True)
+    st.dataframe(df_table,hide_index=True)  # Use st.dataframe(df_table) for an interactive table
+
+    # Gráfico de linhas - Média de indicadores ####################################################################
+    st.write("Sendo o INDE composto por diversos outros indicadores (IAA, IEG, IPS, IPP, IDA, IPV e IAN), ele é impactado principalmente pela performance positiva dos alunos no IAA (Indicador de Autoavaliação) e pela performance negativa dos alunos no IDA (Indicador de Desempenho Acadêmico). Essa discrepância pode indicar a necessidade da instituição analisar falhas no ensino, desafios específicos do aluno ou inconsistências no processo de autoavaliação.")
+    st.markdown("<h4 style='font-size:16px;'>Médias dos Indicadores que compõem o INDE</h4>", unsafe_allow_html=True)
+
+    mean_metrics = df[['INDE 2024', 'IAA', 'IEG', 'IPS', 'IPP', 'IDA', 'IPV', 'IAN']].mean()
+    mean_metrics_df = pd.DataFrame(mean_metrics).reset_index()
+    mean_metrics_df.columns = ['Indicador', 'Média']
+
+    fig, ax = plt.subplots(figsize=(12, 3))
+    sns.lineplot(data=mean_metrics_df, x="Indicador", y="Média", marker="o", ax=ax, color="b", lw=2)
+    ax.set_title("Média dos Indicadores", fontsize=10, fontweight='bold')
+    ax.set_xlabel("Indicadores", fontsize=8)
+    ax.set_ylabel("Média", fontsize=8)
+    plt.xticks(rotation=45, fontsize=8)
+    st.pyplot(fig)
 
 
-    # 2. Gráfico de pizza - Distribuição de Gênero
-    gender_counts = df['Gênero'].value_counts()
-    fig1, ax1 = plt.subplots(figsize=(6, 6))
-    colors = sns.color_palette("pastel")
-    wedges, texts, autotexts = ax1.pie(
-        gender_counts, labels=gender_counts.index, autopct='%1.1f%%', 
-        colors=colors, startangle=90, wedgeprops={'edgecolor': 'black'}
-    )
-    plt.setp(autotexts, size=10, weight="bold")
-    ax1.set_title("Distribuição por Gênero", fontsize=14, fontweight='bold')
+# Quantidade de alunos por pedras #############################################################################
+with st.expander("Distribuição dos alunos na classificação de Pedra-conceito e Análise dos Indicadores por Pedra-conceito"):
+    st.write("A metodologia de Pedra-conceito é utilizada pela Passos Mágicos para classificar seus alunos de acordo com uma faixa de desempenho INDE:")
+    st.write("💎 Pedra Topázio: INDE entre 9,4 e 8,2.")  
+    st.write("💥 Pedra Ametista: INDE entre 8,2 e 7,2.")  
+    st.write("🔮 Pedra Ágata: INDE entre 7,2 e 6,1.")  
+    st.write("💌 Pedra Quartzo: INDE entre 6,1 e 3,0.")  
+    st.write("A maior parte dos alunos se classificam em Topázio e Ametista, indicando um ótimo desempenho geral dos alunos da instituição. Alunos Quartzo, apesar de estarem em menor número, ainda estão em quantidade significativa e precisam de uma atenção especial para conseguirem evoluir para os outros níveis nos próximos anos.")
+    st.markdown("<h4 style='font-size:16px;'>Distribuição dos alunos na classificação de Pedra-conceito</h4>", unsafe_allow_html=True)
 
-    # 3. Gráfico de barras vertical - Idade com linha de INDE 2024
-    fig2, ax2 = plt.subplots(figsize=(10, 5))
-    sns.barplot(x=df['Idade'].value_counts().index, 
-                y=df['Idade'].value_counts().values, 
-                ax=ax2, color=colors[1], alpha=0.7)
-    ax2.set_ylabel("Quantidade de Alunos", fontsize=11)
-    ax2.set_xlabel("Idade", fontsize=11)
-    ax2.set_title("Distribuição de Alunos por Idade e médias INDE 24", fontsize=13, fontweight='bold')
+    stones_counts = df['Pedra 2024'].value_counts()
+    col1, col2, col3, col4 = st.columns(4)
+
+    icons = {
+        "Topázio": "<img src=\"./assets/Topázio.png\" width=\"40px\">",  # ícone de ouro (representação de um diamante/joia)
+        "Ametista": "&#x1F4A5;",  # ícone de ametista (representação de um símbolo de impacto ou brilho)
+        "Agata": "&#x1F52E;",     # ícone de ágata (representação de uma pedra)
+        "Quartzo": "&#x1F48C;"    # ícone de quartzo (representação de uma joia)
+    }
+    stones = ["Topázio", "Ametista", "Agata", "Quartzo"]
+    col = st.columns(4)
+    for i, stone in enumerate(stones):
+        col[i].markdown(f"<h3>{icons[stone]} {stone}</h3>", unsafe_allow_html=True)
+        col[i].metric(label="", value=stones_counts.get(stone, 0))
+
+    st.markdown("<h4 style='font-size:16px;'>Médias dos indicadores por Pedra-conceito</h4>", unsafe_allow_html=True)
+
+    # Agrupar por pedra e calcular a média de cada indicador
+    df_filtered = df[df['Pedra 2024'].isin(stones)]
+    mean_metrics_by_stone = df_filtered.groupby('Pedra 2024')[['INDE 2024', 'IAA', 'IEG', 'IPS', 'IPP', 'IDA', 'IPV', 'IAN']].mean()
+    mean_metrics_melted = mean_metrics_by_stone.reset_index().melt(id_vars='Pedra 2024', var_name='Indicador', value_name='Média')
+
+    # Gráfico de linhas - Média de indicadores por pedra
+    fig, ax = plt.subplots(figsize=(12, 3))
+    sns.lineplot(data=mean_metrics_melted, x="Indicador", y="Média", hue="Pedra 2024", marker="o", ax=ax, lw=2)
+    ax.set_title("Média dos Indicadores por Pedra", fontsize=10, fontweight='bold')
+    ax.set_xlabel("Indicadores", fontsize=8)
+    ax.set_ylabel("Média", fontsize=8)
+    plt.xticks(rotation=45, fontsize=8)
+    ax.legend(loc="lower right")
+    st.pyplot(fig)
+
+    st.write("É evidente que o índice de engajamento (IEG) e o índice de desempenho acadêmico (IDA) são as maiores discrepâncias entre os Alunos Topázio e Alunos Quartzo. Já os indicadores psicosocial (IPS) e psicopedagógico (IPP) não parecem ter grande relevância no distaciamento de desempenho entre esses dois perfis de alunos.")
+
+# Gráfico de barras vertical - Idade com linha de INDE 2024 ################################################
+
+with st.expander("Relacione os Indicadores com Fase Ideal, Idade e Pedra-conceito"):
+
+    # Opções para os filtros
+    opcoes_x = ["Idade", "Pedra 2024", "Fase Ideal"]
+    opcoes_y_sec = inde_columns
+
+    # Filtros no Streamlit
+    eixo_x = st.selectbox("Escolha a variável categárica:", opcoes_x)
+    eixo_y_sec = st.selectbox("Escolha o indicador:", opcoes_y_sec)
+
+    # Criando o gráfico
+    fig, ax1 = plt.subplots(figsize=(12, 4))
+
+    # Gráfico de barras (quantidade de alunos)
+    sns.barplot(x=df[eixo_x].value_counts().index, 
+                y=df[eixo_x].value_counts().values, 
+                ax=ax1, alpha=0.7)
+    ax1.set_ylabel("Quantidade de Alunos", fontsize=8)
+    ax1.set_xlabel(eixo_x, fontsize=8)
+    ax1.set_title(f"Distribuição de Alunos por {eixo_x} e médias {eixo_y_sec}", fontsize=10, fontweight='bold')
     plt.xticks(rotation=45)
 
-    ax3 = ax2.twinx()
-    sns.lineplot(x=df.groupby('Idade')['INDE 2024'].mean().index, 
-                 y=df.groupby('Idade')['INDE 2024'].mean().values, 
-                 ax=ax3, color=colors[0], marker='o', linewidth=2.5)
-    ax3.set_ylabel("Média INDE 2024", fontsize=11)
+    # Criando eixo secundário
+    ax2 = ax1.twinx()
 
-    # 4. Gráfico de barras vertical - Fase Ideal com linha de INDE 2024
-    fig3, ax4 = plt.subplots(figsize=(10, 5))
-    sns.barplot(x=df['Fase Ideal'].value_counts().index, 
-                y=df['Fase Ideal'].value_counts().values, 
-                ax=ax4, color=colors[2], alpha=0.7)
-    ax4.set_ylabel("Quantidade de Alunos", fontsize=11)
-    ax4.set_xlabel("Fase Ideal", fontsize=11)
-    ax4.set_title("Quantidade de Alunos por Fase Ideal e médias INDE 24", fontsize=13, fontweight='bold')
-    plt.xticks(rotation=45)
+    # Gráfico de linha (média do indicador escolhido)
+    sns.lineplot(x=df.groupby(eixo_x)[eixo_y_sec].mean().index, 
+                y=df.groupby(eixo_x)[eixo_y_sec].mean().values, 
+                ax=ax2, marker='o', linewidth=2.5)
+    ax2.set_ylabel(f"Média {eixo_y_sec}", fontsize=8)
 
-    ax5 = ax4.twinx()
-    sns.lineplot(x=df.groupby('Fase Ideal')['INDE 2024'].mean().index, 
-                 y=df.groupby('Fase Ideal')['INDE 2024'].mean().values, 
-                 ax=ax5, color=colors[3], marker='s', linewidth=2.5)
-    ax5.set_ylabel("Média INDE 2024", fontsize=11)
+    # Exibir gráfico no Streamlit
+    st.pyplot(fig)
 
-    # 5. Gráfico de barras - Média de indicadores por Gênero
-    mean_metrics = df.groupby('Gênero')[['INDE 2024', 'IAA', 'IEG', 'IPS', 'IPP', 'IDA', 'IPV', 'IAN']].mean().reset_index()
-    fig5, ax7 = plt.subplots(figsize=(12, 6))
-    sns.barplot(data=mean_metrics.melt(id_vars='Gênero', var_name='Indicador', value_name='Média'), 
-                x='Indicador', y='Média', hue='Gênero', ax=ax7, palette="Set2")
-    ax7.set_title("Média dos Indicadores por Gênero", fontsize=14, fontweight='bold')
-    ax7.set_xlabel("Indicadores", fontsize=12)
-    ax7.set_ylabel("Média", fontsize=12)
-    plt.xticks(rotation=45, fontsize=10)
-    ax7.legend(title="Gênero", loc="upper right")
-
-    # Organizando os gráficos
-    col1, col2 = st.columns(2)
-    col1.pyplot(fig1)
-    col2.pyplot(fig5)
-
-    st.markdown("---")
-    st.pyplot(fig2)
-    st.pyplot(fig3)
-
-   
-# Página: Análise do Aluno
-elif escolha == "Análise do Aluno":
-    st.title("Análise do Aluno")
-    st.write("Detalhamento por aluno ainda não implementado.")
-
-# Página: Análise do Avaliador
-elif escolha == "Análise do Avaliador":
-    st.title("Análise do Avaliador")
-
-    avaliadores = ['Avaliador1', 'Avaliador2', 'Avaliador3', 'Avaliador4', 'Avaliador5', 'Avaliador6']
-    avaliador_escolhido = st.selectbox("Selecione o Avaliador:", avaliadores)
-    avaliador_stats_inde = df.groupby(avaliador_escolhido)[['INDE 2024', 'INDE 23', 'INDE 22']].agg(['mean', 'max', 'min']).round(2).reset_index()
-
-    # Flatten the multi-level columns for easier readability
-    avaliador_stats_inde.columns = [' '.join(col).strip() for col in avaliador_stats_inde.columns.values]
-
-    # Display the resulting DataFrame
-    st.dataframe(avaliador_stats_inde)
-
-    avaliador_nomes = df[avaliador_escolhido].dropna().unique()
-    avaliador_nome_escolhido = st.selectbox("Selecione o nome do Avaliador:", avaliador_nomes)
-    
-    # Filtrar dados do avaliador
-    filtered_df = df[df[avaliador_escolhido] == avaliador_nome_escolhido]
-    # Média dos INDEs do avaliador escolhido
-    # Filter the DataFrame for the specific 'avaliador_nome_escolhido'
-    avaliador_mean = avaliador_stats_inde[avaliador_stats_inde[avaliador_escolhido] == avaliador_nome_escolhido]
-
-    # Select only the columns related to the mean
-    mean_columns = [col for col in avaliador_stats_inde.columns if 'mean' in col]
-    avaliador_mean = avaliador_mean[[avaliador_escolhido] + mean_columns]
-
-    # Display the resulting DataFrame
-    st.dataframe(avaliador_mean)
-
-    if not avaliador_mean.empty:
-        years = ['2022', '2023', '2024']
-        inde_values = [avaliador_mean['INDE 22 mean'].values[0], avaliador_mean['INDE 23 mean'].values[0], avaliador_mean['INDE 2024 mean'].values[0]]
-        
-        fig, ax = plt.subplots(figsize=(5, 3))
-        ax.plot(years, inde_values, marker='o', linestyle='-', color='b', label=f'{avaliador_nome_escolhido}')
-        ax.set_xlabel('Ano')
-        ax.set_ylabel('Média INDE')
-        ax.set_title(f'Média dos INDEs para {avaliador_nome_escolhido}')
-        ax.legend()
-        ax.grid(True)
-        
-        st.pyplot(fig)
-    else:
-        st.write("Nenhum dado encontrado para este avaliador.")
+    st.markdown("<h4 style='font-size:16px;'>Análise por Idade</h4>", unsafe_allow_html=True)
+    st.write("O INDE começa a diminuir no início da fase adulta, entre 17 e 23 anos, possivelmente devido a fatores pessoais. Essa queda pode estar relacionada à redução do IEG (Índice de Engajamento), que diminui após os 17 anos. Além disso, o IAA (Índice de Autoavaliação) também sofre uma queda significativa nesse período de transição da adolescência para a vida adulta. No entanto, aos 17 anos, observa-se o maior IPV (Índice de Ponto de Virada), o que pode indicar que a PM já cumpriu seu papel no desenvolvimento do aluno, tornando-o mais independente da instituição.")
+    st.markdown("<h4 style='font-size:16px;'>Análise por Fase Ideal</h4>", unsafe_allow_html=True)
+    st.write("Quando analisamos os alunos da fase 3 (7ª e 8ª série), que apresentam os menores índices de INDE, é possível identificar que os maiores responsáveis por essa queda são o IAA (Índice de Autoavaliação), o IPP (Indicador Psicopedagógico) e o IDA (Índice de Desempenho Acadêmico). Nesse período, os alunos estão em uma fase de transição emocional e psicológica, o que pode levar a uma diminuição na confiança e na percepção sobre suas próprias habilidades. Além disso, o aumento da complexidade dos conteúdos e a maior pressão por desempenho, juntamente com os fatores emocionais e psicológicos, contribuem para a queda nesses índices.")

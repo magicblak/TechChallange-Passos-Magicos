@@ -78,14 +78,38 @@ class Data_treatment_controller:
     
     def get_student_percentile(self, student_row_id):
         data = self.get_raw_data()
-        student_phase = data[data['id'] == student_row_id].phase.values[0]
+        if data.empty:
+            return "Sem percentil"
+        student_row = data.loc[data['id'] == student_row_id]
+        if student_row.empty:
+            return "Sem percentil"
+        student_phase = student_row['phase'].values[0]
         data = data[data['phase'] == student_phase]
-        data['inde'] = data['inde'].fillna(0)
-        data['inde'] = data['inde'] + np.random.uniform(0, 1e-5, size=len(data['inde']))
-        data['percentile'] = pd.qcut(data['inde'], q=100, labels=[f'{(i)}%' for i in range(1, 101)])
-        student_info = data[data['id'] == student_row_id]
-        return student_info['percentile'].values[0]
-    
+        data['inde'] = pd.to_numeric(data['inde'], errors='coerce').fillna(0)
+        unique_values = len(data['inde'].unique())
+        if unique_values >= 100:
+            q = 100
+        elif unique_values >= 10:
+            q = 10
+        else:
+            return "Sem percentil"
+        try:
+            cut_result, bin_edges = pd.qcut(
+                data['inde'], 
+                q=min(q, unique_values),
+                retbins=True, 
+                duplicates="drop"
+            )
+            actual_bins = len(bin_edges) - 1
+            labels = [f'{i}%' for i in range(1, actual_bins + 1)]  # Ensure correct label count
+            data['decile'] = pd.qcut(data['inde'], q=actual_bins, labels=labels, duplicates="drop")
+        
+        except ValueError as e:
+            print(f"Error in qcut: {e}")  # Log the issue for debugging
+            return "Sem percentil"
+        student_info = data.loc[data['id'] == student_row_id, 'decile']
+        return student_info.values[0] if not student_info.empty else "Sem percentil"
+      
     def get_concept_stone_inde(self, student_row_id):
         inde_data = self.get_historycal_indicators(student_row_id)['inde'].values[-1]
         if(inde_data < 6.1): return 'Quartzo'
