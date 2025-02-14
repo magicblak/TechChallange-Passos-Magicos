@@ -97,7 +97,7 @@ with st.expander("Distribuição dos alunos na classificação de Pedra-conceito
 
     stones_counts = df['Pedra 2024'].value_counts()
     col1, col2, col3, col4 = st.columns(4)
-    stones = ["Topázio", "Ametista", "ágata", "Quartzo"]
+    stones = ["Topázio", "Ametista", "Ágata", "Quartzo"]
     col = st.columns(4)
     for i, stone in enumerate(stones):
         with col[i]:
