@@ -35,7 +35,7 @@ col1, col2, col3 = st.columns(3)
 icon_total = "&#x1F464;"  # Unicode para o ícone de boneco (total)
 icon_feminino = "&#x1F467;"  # Unicode para o ícone de menina
 icon_masculino = "&#x1F466;"  # Unicode para o ícone de menino
-col1.markdown(f"<h3>{icon_total} Total de alunos</h3>", unsafe_allow_html=True)
+col1.markdown(f"<h3>{icon_total} Estudantes</h3>", unsafe_allow_html=True)
 col1.metric(label="", value=gender_counts.sum())
 col2.markdown(f"<h3>{icon_feminino} Feminino</h3>", unsafe_allow_html=True)
 col2.metric(label="", value=gender_counts.get('Feminino', 0))
@@ -88,27 +88,22 @@ with st.expander("Análise Geral das médias dos indicadores e comparação com 
 # Quantidade de alunos por pedras #############################################################################
 with st.expander("Distribuição dos alunos na classificação de Pedra-conceito e Análise dos Indicadores por Pedra-conceito"):
     st.write("A metodologia de Pedra-conceito é utilizada pela Passos Mágicos para classificar seus alunos de acordo com uma faixa de desempenho INDE:")
-    st.write("💎 Pedra Topázio: INDE entre 9,4 e 8,2.")  
-    st.write("💥 Pedra Ametista: INDE entre 8,2 e 7,2.")  
-    st.write("🔮 Pedra Ágata: INDE entre 7,2 e 6,1.")  
-    st.write("💌 Pedra Quartzo: INDE entre 6,1 e 3,0.")  
+    st.write("Pedra Topázio: INDE entre 9,4 e 8,2.")  
+    st.write("Pedra Ametista: INDE entre 8,2 e 7,2.")  
+    st.write("Pedra Ágata: INDE entre 7,2 e 6,1.")  
+    st.write("Pedra Quartzo: INDE entre 6,1 e 3,0.")  
     st.write("A maior parte dos alunos se classificam em Topázio e Ametista, indicando um ótimo desempenho geral dos alunos da instituição. Alunos Quartzo, apesar de estarem em menor número, ainda estão em quantidade significativa e precisam de uma atenção especial para conseguirem evoluir para os outros níveis nos próximos anos.")
     st.markdown("<h4 style='font-size:16px;'>Distribuição dos alunos na classificação de Pedra-conceito</h4>", unsafe_allow_html=True)
 
     stones_counts = df['Pedra 2024'].value_counts()
     col1, col2, col3, col4 = st.columns(4)
-
-    icons = {
-        "Topázio": "<img src=\"./assets/Topázio.png\" width=\"40px\">",  # ícone de ouro (representação de um diamante/joia)
-        "Ametista": "&#x1F4A5;",  # ícone de ametista (representação de um símbolo de impacto ou brilho)
-        "Agata": "&#x1F52E;",     # ícone de ágata (representação de uma pedra)
-        "Quartzo": "&#x1F48C;"    # ícone de quartzo (representação de uma joia)
-    }
-    stones = ["Topázio", "Ametista", "Agata", "Quartzo"]
+    stones = ["Topázio", "Ametista", "ágata", "Quartzo"]
     col = st.columns(4)
     for i, stone in enumerate(stones):
-        col[i].markdown(f"<h3>{icons[stone]} {stone}</h3>", unsafe_allow_html=True)
-        col[i].metric(label="", value=stones_counts.get(stone, 0))
+        with col[i]:
+            st.image(f"./assets/{stone}.png", width=80)
+            st.markdown(f"<h3>{stone}</h3>", unsafe_allow_html=True)
+            st.metric(label="", value=stones_counts.get(stone, 0))
 
     st.markdown("<h4 style='font-size:16px;'>Médias dos indicadores por Pedra-conceito</h4>", unsafe_allow_html=True)
 
